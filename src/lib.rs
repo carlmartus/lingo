@@ -1,7 +1,9 @@
-extern crate gl;
+pub extern crate gl;
 extern crate glutin;
 
 pub mod window;
+pub mod hwbuf;
+pub mod shader;
 
 pub fn print_version() {
     print!("Hello work");

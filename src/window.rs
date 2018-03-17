@@ -46,7 +46,7 @@ impl Window {
             gl::load_with(|symbol| {
                 gl_window.get_proc_address(symbol) as *const _
             });
-            gl::ClearColor(0.0, 1.0, 0.0, 1.0);
+            //gl::ClearColor(0.0, 1.0, 0.0, 1.0);
         }
 
         Window {
@@ -56,11 +56,7 @@ impl Window {
         }
     }
 
-    pub fn draw(&self) {
-        unsafe {
-            gl::Clear(gl::COLOR_BUFFER_BIT);
-        }
-
+    pub fn swap_buffers(&self) {
         self.gl_window.swap_buffers().unwrap();
     }
 
