@@ -2,6 +2,7 @@ extern crate lingo;
 
 use lingo::window::{Window, Command, Peripheral};
 use lingo::shader::Program;
+use lingo::hwbuf::HwBuf;
 use lingo::gl;
 
 const RED_VERT: &'static str = r#"
@@ -22,9 +23,15 @@ void main() {
 }
 "#;
 
+struct Vertex {
+    x: f32,
+    y: f32,
+}
+
 struct Sample {
     win: Window,
     prog: Program,
+    verts: HwBuf<Vertex>,
 }
 
 fn main() {
@@ -36,20 +43,21 @@ fn main() {
 
 impl Sample {
     pub fn new() -> Result<Sample, String> {
-        let win = Window::new("dialog");
-
-        unsafe {
-            gl::ClearColor(0.3, 0.4, 0.5, 1.0);
-        }
-
+        let win = Window::new("dialog")?;
         let prog = Program::from_static(RED_VERT, RED_FRAG)?;
+        let mut verts = HwBuf::new(10)?;
 
         unsafe {
             gl::ClearColor(0.3, 0.4, 0.5, 1.0);
         }
+
+        verts.push(Vertex { x: 0.0, y: 0.0 });
+        verts.push(Vertex { x: 1.0, y: 0.0 });
+        verts.push(Vertex { x: 0.0, y: 1.0 });
+        verts.prepear_graphics();
 
         Ok(Sample {
-            win, prog,
+            win, prog, verts,
         })
     }
 

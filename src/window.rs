@@ -32,7 +32,7 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(title: &'static str) -> Window {
+    pub fn new(title: &'static str) -> Result<Window, String> {
         let events_loop = glutin::EventsLoop::new();
         let window = glutin::WindowBuilder::new()
             .with_title(title)
@@ -49,11 +49,11 @@ impl Window {
             //gl::ClearColor(0.0, 1.0, 0.0, 1.0);
         }
 
-        Window {
+        Ok(Window {
             events_loop, gl_window,
             queue_peripheral: VecDeque::with_capacity(QUEUE_LEN),
             queue_command: VecDeque::with_capacity(QUEUE_LEN),
-        }
+        })
     }
 
     pub fn swap_buffers(&self) {

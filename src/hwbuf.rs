@@ -8,7 +8,7 @@ pub struct HwBuf<T> {
 }
 
 impl<T> HwBuf<T> {
-    pub fn new(max_verts: usize) -> HwBuf<T> {
+    pub fn new(max_verts: usize) -> Result<HwBuf<T>, String> {
         let mut gl_vbo: u32 = 0;
         unsafe {
             let max_size: isize = (max_verts * mem::size_of::<T>()) as isize;
@@ -18,10 +18,10 @@ impl<T> HwBuf<T> {
                             ptr::null(), gl::DYNAMIC_DRAW);
         };
 
-        HwBuf {
+        Ok(HwBuf {
             gl_vbo,
             data: Vec::with_capacity(max_verts),
-        }
+        })
     }
 
     pub fn push(&mut self, vert: T) {
@@ -43,5 +43,9 @@ impl<T> HwBuf<T> {
             gl::BufferSubData(gl::ARRAY_BUFFER, 0, tot_size,
                               mem::transmute(&self.data[0]));
         }
+    }
+
+    pub fn vertex_count(&self) -> usize {
+        self.data.len()
     }
 }
