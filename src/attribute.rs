@@ -69,12 +69,12 @@ impl DataType {
 }
 
 impl Attribute {
-    pub fn new(stride: usize, primitive_type: PrimitiveType) -> Attribute {
-        Attribute {
+    pub fn new(stride: usize, primitive_type: PrimitiveType) -> Result<Attribute, String> {
+        Ok(Attribute {
             draw_type: PrimitiveType::to_gl_enum(primitive_type),
             parts: Vec::new(),
             stride: stride as GLint,
-        }
+        })
     }
 
     pub fn push_attribute(

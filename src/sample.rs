@@ -3,6 +3,7 @@ extern crate lingo;
 use lingo::window::{Window, Command, Peripheral};
 use lingo::shader::Program;
 use lingo::hwbuf::HwBuf;
+use lingo::attribute::{Attribute, PrimitiveType, DataType};
 use lingo::gl;
 
 const RED_VERT: &'static str = r#"
@@ -32,6 +33,7 @@ struct Sample {
     win: Window,
     prog: Program,
     verts: HwBuf<Vertex>,
+    attribs: Attribute,
 }
 
 fn main() {
@@ -46,6 +48,8 @@ impl Sample {
         let win = Window::new("dialog")?;
         let prog = Program::from_static(RED_VERT, RED_FRAG)?;
         let mut verts = HwBuf::new(10)?;
+        let mut attribs = Attribute::new(8, PrimitiveType::Triangles)?;
+        attribs.push_attribute(0, 2, DataType::F32, false);
 
         unsafe {
             gl::ClearColor(0.3, 0.4, 0.5, 1.0);
@@ -57,7 +61,7 @@ impl Sample {
         verts.prepear_graphics();
 
         Ok(Sample {
-            win, prog, verts,
+            win, prog, verts, attribs,
         })
     }
 
@@ -83,6 +87,8 @@ impl Sample {
             }
 
             self.prog.use_program();
+            self.verts.bind();
+            self.attribs.draw(3);
 
             unsafe {
                 gl::Clear(gl::COLOR_BUFFER_BIT);

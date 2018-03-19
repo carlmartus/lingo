@@ -24,6 +24,12 @@ impl<T> HwBuf<T> {
         })
     }
 
+    pub fn bind(&self) {
+        unsafe {
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.gl_vbo);
+        }
+    }
+
     pub fn push(&mut self, vert: T) {
         if self.data.len() <= self.data.capacity() {
             self.data.push(vert);
