@@ -1,6 +1,7 @@
 extern crate gl;
 
 use gl::types::{GLuint, GLint, GLenum, GLboolean};
+use error;
 
 pub enum PrimitiveType {
     Points,
@@ -20,7 +21,7 @@ pub enum DataType {
 }
 
 struct Part {
-    buffer_id: GLuint,
+    buffer_id: usize,
     element_count: GLint,
     data_type: GLenum,
     size: usize,
@@ -30,6 +31,7 @@ struct Part {
 pub struct Attribute {
     draw_type: GLenum,
     parts: Vec<Part>,
+    buffers: Vec<GLuint>,
     stride: GLint,
 }
 
@@ -73,6 +75,7 @@ impl Attribute {
         Ok(Attribute {
             draw_type: PrimitiveType::to_gl_enum(primitive_type),
             parts: Vec::new(),
+            buffers: Vec::new(),
             stride: stride as GLint,
         })
     }
@@ -91,12 +94,18 @@ impl Attribute {
         let data_type = data_type.to_gl_enum();
 
         self.parts.push(Part {
-            buffer_id: buffer_id as GLuint,
+            buffer_id,
             element_count: element_count as GLint,
             data_type,
             size,
             normalize,
         });
+    }
+
+    pub fn push_buffer(&mut self, buffer_id: GLuint) -> usize {
+        let index = self.buffers.len();
+        self.buffers.push(buffer_id);
+        index
     }
 
     pub fn draw(&self, vertex_count: usize) {
@@ -107,13 +116,26 @@ impl Attribute {
 
             unsafe {
                 gl::EnableVertexAttribArray(i);
-                gl::BindBuffer(gl::ARRAY_BUFFER, p.buffer_id);
+                error::print_gl_error();
+
+                let buffer_id = self.buffers[p.buffer_id];
+                gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
+                error::print_gl_error();
 
                 gl::VertexAttribPointer(
-                    i, p.element_count,
+                    p.buffer_id as GLuint, p.element_count,
                     p.data_type, p.normalize,
                     self.stride,
                     offset as *const gl::types::GLvoid);
+
+                //gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 24, offset as *const gl::types::GLvoid);
+                //gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+                /*
+                gl::VertexAttribPointer(
+                    p.buffer_id as GLuint, p.element_count,
+                    p.data_type, p.normalize, 8, ptr::null());
+                    */
+                error::print_gl_error();
 
                 offset += p.size;
             }
@@ -121,11 +143,14 @@ impl Attribute {
 
         unsafe {
             gl::DrawArrays(self.draw_type, 0, vertex_count as GLint);
+            //gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            error::print_gl_error();
         }
 
         for i in 0..self.parts.len() {
             unsafe {
                 gl::DisableVertexAttribArray(i as u32);
+                error::print_gl_error();
             }
         }
     }

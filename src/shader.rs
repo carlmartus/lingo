@@ -2,6 +2,7 @@ extern crate gl;
 
 use std::{ffi, ptr, str};
 use gl::types::{GLint, GLuint, GLchar, GLenum};
+use std::ffi::CString;
 
 pub enum Type {
     Vertex,
@@ -22,7 +23,9 @@ impl Type {
 }
 
 impl Program {
-    pub fn from_static(vert_src: &'static str, frag_src: &'static str) ->
+    pub fn from_static(
+        vert_src: &'static str, frag_src: &'static str,
+        attribute_binds: &[&'static str]) ->
     Result<Program, String> {
         let id_vert = create_shader(gl::VERTEX_SHADER, vert_src.to_string())?;
         let id_frag = create_shader(gl::FRAGMENT_SHADER, frag_src.to_string())?;
@@ -33,6 +36,16 @@ impl Program {
             gl::AttachShader(program, id_vert);
             gl::AttachShader(program, id_frag);
             gl::LinkProgram(program);
+
+            for (i, attribute) in attribute_binds.iter().enumerate() {
+                gl::BindAttribLocation(
+                    program,
+                    i as GLuint,
+                    CString::new(*attribute).unwrap().as_ptr());
+            }
+
+            gl::DeleteShader(id_vert);
+            gl::DeleteShader(id_frag);
         }
 
         Ok(Program {

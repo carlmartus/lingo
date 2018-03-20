@@ -1,6 +1,8 @@
+extern crate gl;
+
 use std::vec::Vec;
 use std::{mem, ptr};
-extern crate gl;
+use gl::types::GLuint;
 
 pub struct HwBuf<T> {
     gl_vbo: u32,
@@ -15,7 +17,7 @@ impl<T> HwBuf<T> {
             gl::GenBuffers(1, &mut gl_vbo);
             gl::BindBuffer(gl::ARRAY_BUFFER, gl_vbo);
             gl::BufferData( gl::ARRAY_BUFFER, max_size,
-                            ptr::null(), gl::DYNAMIC_DRAW);
+                            ptr::null(), gl::STATIC_DRAW);
         };
 
         Ok(HwBuf {
@@ -28,6 +30,10 @@ impl<T> HwBuf<T> {
         unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, self.gl_vbo);
         }
+    }
+
+    pub fn get_gl_id(&self) -> GLuint {
+        self.gl_vbo
     }
 
     pub fn push(&mut self, vert: T) {

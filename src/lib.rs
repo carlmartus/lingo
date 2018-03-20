@@ -5,6 +5,7 @@ pub mod window;
 pub mod hwbuf;
 pub mod shader;
 pub mod attribute;
+pub mod error;
 
 pub fn print_version() {
     print!("Hello work");

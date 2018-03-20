@@ -4,10 +4,11 @@ use lingo::window::{Window, Command, Peripheral};
 use lingo::shader::Program;
 use lingo::hwbuf::HwBuf;
 use lingo::attribute::{Attribute, PrimitiveType, DataType};
-use lingo::gl;
+use lingo::{gl, error};
 
 const RED_VERT: &'static str = r#"
-#version 130
+#version 100
+precision mediump float;
 
 attribute vec2 at_loc;
 
@@ -17,17 +18,15 @@ void main() {
 "#;
 
 const RED_FRAG: &'static str = r#"
-#version 130
+#version 100
+precision mediump float;
 
 void main() {
     gl_FragColor = vec4(1, 0, 0, 1);
 }
 "#;
 
-struct Vertex {
-    x: f32,
-    y: f32,
-}
+struct Vertex(f32, f32);
 
 struct Sample {
     win: Window,
@@ -46,19 +45,29 @@ fn main() {
 impl Sample {
     pub fn new() -> Result<Sample, String> {
         let win = Window::new("dialog")?;
-        let prog = Program::from_static(RED_VERT, RED_FRAG)?;
+        error::print_gl_error();
+
+        let binds = ["at_loc"];
+        let prog = Program::from_static(RED_VERT, RED_FRAG, &binds)?;
+        error::print_gl_error();
         let mut verts = HwBuf::new(10)?;
+        error::print_gl_error();
         let mut attribs = Attribute::new(8, PrimitiveType::Triangles)?;
+        error::print_gl_error();
+        attribs.push_buffer(verts.get_gl_id());
         attribs.push_attribute(0, 2, DataType::F32, false);
+        error::print_gl_error();
 
         unsafe {
             gl::ClearColor(0.3, 0.4, 0.5, 1.0);
         }
 
-        verts.push(Vertex { x: 0.0, y: 0.0 });
-        verts.push(Vertex { x: 1.0, y: 0.0 });
-        verts.push(Vertex { x: 0.0, y: 1.0 });
+        verts.push(Vertex(0.0, 0.0));
+        verts.push(Vertex(1.0, 0.0));
+        verts.push(Vertex(0.0, 1.0));
         verts.prepear_graphics();
+
+        error::print_gl_error();
 
         Ok(Sample {
             win, prog, verts, attribs,
@@ -86,13 +95,17 @@ impl Sample {
                 }
             }
 
-            self.prog.use_program();
-            self.verts.bind();
-            self.attribs.draw(3);
-
             unsafe {
                 gl::Clear(gl::COLOR_BUFFER_BIT);
             }
+
+            self.prog.use_program();
+            error::print_gl_error();
+            self.verts.bind();
+            error::print_gl_error();
+            self.attribs.draw(3);
+            error::print_gl_error();
+
             self.win.swap_buffers();
         }
     }
