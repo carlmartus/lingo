@@ -1,7 +1,6 @@
 extern crate gl;
 
 use gl::types::{GLuint, GLint, GLenum, GLboolean};
-use error;
 
 pub enum PrimitiveType {
     Points,
@@ -116,41 +115,26 @@ impl Attribute {
 
             unsafe {
                 gl::EnableVertexAttribArray(i);
-                error::print_gl_error();
 
                 let buffer_id = self.buffers[p.buffer_id];
                 gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
-                error::print_gl_error();
 
                 gl::VertexAttribPointer(
                     p.buffer_id as GLuint, p.element_count,
                     p.data_type, p.normalize,
                     self.stride,
                     offset as *const gl::types::GLvoid);
-
-                //gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 24, offset as *const gl::types::GLvoid);
-                //gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
-                /*
-                gl::VertexAttribPointer(
-                    p.buffer_id as GLuint, p.element_count,
-                    p.data_type, p.normalize, 8, ptr::null());
-                    */
-                error::print_gl_error();
-
                 offset += p.size;
             }
         }
 
         unsafe {
             gl::DrawArrays(self.draw_type, 0, vertex_count as GLint);
-            //gl::DrawArrays(gl::TRIANGLES, 0, 3);
-            error::print_gl_error();
         }
 
         for i in 0..self.parts.len() {
             unsafe {
                 gl::DisableVertexAttribArray(i as u32);
-                error::print_gl_error();
             }
         }
     }
