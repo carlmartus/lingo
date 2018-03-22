@@ -2,22 +2,39 @@ extern crate gl;
 
 use std::vec::Vec;
 use std::{mem, ptr};
-use gl::types::GLuint;
+use gl::types::{GLuint, GLenum};
+
+pub enum Usage {
+    Stream,
+    Static,
+    Dynamic,
+}
 
 pub struct HwBuf<T> {
     gl_vbo: u32,
     data: Vec<T>,
 }
 
+impl Usage {
+    pub fn to_gl_enum(&self) -> GLenum {
+        match *self {
+            Usage::Stream   => gl::STREAM_DRAW,
+            Usage::Static   => gl::STATIC_DRAW,
+            Usage::Dynamic  => gl::DYNAMIC_DRAW,
+        }
+    }
+}
+
 impl<T> HwBuf<T> {
-    pub fn new(max_verts: usize) -> Result<HwBuf<T>, String> {
+    pub fn new(max_verts: usize, usage: Usage) -> Result<HwBuf<T>, String> {
         let mut gl_vbo: u32 = 0;
+
         unsafe {
             let max_size: isize = (max_verts * mem::size_of::<T>()) as isize;
             gl::GenBuffers(1, &mut gl_vbo);
             gl::BindBuffer(gl::ARRAY_BUFFER, gl_vbo);
             gl::BufferData( gl::ARRAY_BUFFER, max_size,
-                            ptr::null(), gl::STATIC_DRAW);
+                            ptr::null(), usage.to_gl_enum());
         };
 
         Ok(HwBuf {

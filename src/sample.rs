@@ -2,7 +2,7 @@ extern crate lingo;
 
 use lingo::window::{Window, Command, Peripheral};
 use lingo::shader::Program;
-use lingo::hwbuf::HwBuf;
+use lingo::hwbuf::{HwBuf, Usage};
 use lingo::attribute::{Attribute, PrimitiveType, DataType};
 use lingo::{gl, error};
 
@@ -50,7 +50,7 @@ impl Sample {
         let binds = ["at_loc"];
         let prog = Program::from_static(RED_VERT, RED_FRAG, &binds)?;
         error::print_gl_error();
-        let mut verts = HwBuf::new(10)?;
+        let mut verts = HwBuf::new(10, Usage::Static)?;
         error::print_gl_error();
         let mut attribs = Attribute::new(8, PrimitiveType::Triangles)?;
         error::print_gl_error();
