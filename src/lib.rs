@@ -13,9 +13,11 @@ pub fn print_version() {
 
 #[cfg(test)]
 mod tests {
+    use print_version;
+
     #[test]
     fn version() {
-        Lingo::print_version();
+        print_version();
         assert_eq!(2 + 2, 4);
     }
 }

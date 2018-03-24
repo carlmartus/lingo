@@ -1,4 +1,6 @@
 # Lingo
+[![Build Status](https://travis-ci.org/carlmartus/lingo.svg?branch=master)](https://travis-ci.org/carlmartus/lingo)
+
 Rust OpenGL ES 2.0 library.
 
 Using the OpenGL ES 2.0 API directly can be a lot of work.
