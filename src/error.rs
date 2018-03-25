@@ -14,9 +14,12 @@ pub fn check_gl_error() -> Result<(), String> {
     }
 }
 
-pub fn print_gl_error() {
+pub fn print_gl_error() -> Result<(), String> {
     match check_gl_error() {
-        Err(msg) => eprintln!("GL error: {}", msg),
-        _ => (),
+        Err(msg) => {
+            eprintln!("GL error: {}", msg);
+            Err(msg)
+        },
+        _ => Ok(()),
     }
 }

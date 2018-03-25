@@ -44,30 +44,32 @@ fn main() {
 
 impl Sample {
     pub fn new() -> Result<Sample, String> {
+        // Create window
         let win = Window::new("dialog")?;
-        error::print_gl_error();
 
-        let binds = ["at_loc"];
-        let prog = Program::from_static(RED_VERT, RED_FRAG, &binds)?;
-        error::print_gl_error();
+        // Create shader program from source
+        let prog = Program::from_static(RED_VERT, RED_FRAG, &["at_loc"])?;
+
+        // Create buffer for geometry
         let mut verts = HwBuf::new(10, Usage::Static)?;
-        error::print_gl_error();
-        let mut attribs = Attribute::new(8, PrimitiveType::Triangles)?;
-        error::print_gl_error();
-        attribs.push_buffer(verts.get_gl_id());
-        attribs.push_attribute(0, 2, DataType::F32, false);
-        error::print_gl_error();
 
-        unsafe {
-            gl::ClearColor(0.3, 0.4, 0.5, 1.0);
-        }
-
+        // Fill buffer with a triangle
         verts.push(Vertex(0.0, 0.0));
         verts.push(Vertex(1.0, 0.0));
         verts.push(Vertex(0.0, 1.0));
         verts.prepear_graphics();
 
-        error::print_gl_error();
+        // Describe rendering attributes
+        let mut attribs = Attribute::new(8, PrimitiveType::Triangles)?;
+        attribs.push_buffer(verts.get_gl_id());
+        attribs.push_attribute(0, 2, DataType::F32, false);
+
+        // Did any error occur?
+        error::print_gl_error()?;
+
+        unsafe {
+            gl::ClearColor(0.3, 0.4, 0.5, 1.0);
+        }
 
         Ok(Sample {
             win, prog, verts, attribs,
@@ -100,11 +102,10 @@ impl Sample {
             }
 
             self.prog.use_program();
-            error::print_gl_error();
             self.verts.bind();
-            error::print_gl_error();
             self.attribs.draw(3);
-            error::print_gl_error();
+
+            error::print_gl_error().unwrap();
 
             self.win.swap_buffers();
         }
