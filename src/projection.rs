@@ -62,4 +62,24 @@ impl Matrix4x4 {
             self.values[*i] = 0f32;
         });
     }
+
+    pub fn multiply(a: &Matrix4x4, b: &Matrix4x4) -> Matrix4x4 {
+
+        let mut values = [0f32; 16];
+
+        let mut i = 0;
+        for y in 0..4 {
+            for x in 0..4 {
+                let r = y << 2;
+                values[i] =
+                    a.values[r+ 0]*b.values[x+ 0] +
+                    a.values[r+ 1]*b.values[x+ 4] +
+                    a.values[r+ 2]*b.values[x+ 8] +
+                    a.values[r+ 3]*b.values[x+12];
+                i = i+1;
+            }
+        }
+
+        Matrix4x4 { values }
+    }
 }
