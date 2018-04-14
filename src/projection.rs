@@ -13,10 +13,14 @@ impl Matrix4x4 {
         res
     }
 
+    pub fn get_xy(&self, x: usize, y: usize) -> f32 {
+        self.values[x + y*4]
+    }
+
     pub fn identity(&mut self) {
         // Set diagonal to 1
         [0, 5, 10, 15].iter().for_each(|i| {
-            self.values[*i] = 0f32
+            self.values[*i] = 1f32
         });
 
         // Set rest to 0
