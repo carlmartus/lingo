@@ -9,12 +9,4 @@ pub mod error;
 pub mod projection;
 
 #[cfg(test)]
-mod tests {
-    use print_version;
-
-    #[test]
-    fn version() {
-        print_version();
-        assert_eq!(2 + 2, 4);
-    }
-}
+mod test;
