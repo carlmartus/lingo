@@ -2,6 +2,31 @@ pub struct Matrix4x4 {
     values: [f32; 16],
 }
 
+#[derive(Clone)]
+pub struct Vec3(f32, f32, f32);
+
+impl Vec3 {
+    fn normalize(&self) -> Vec3 {
+        let r = (self.0*self.0 + self.1*self.1 + self.2*self.2).sqrt();
+        if r == 0f32 {
+            self.clone()
+        } else {
+            let r = 1f32 / r;
+            Vec3(
+                self.0*r,
+                self.1*r,
+                self.2*r)
+        }
+    }
+
+    fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
+        Vec3(
+            a.1*b.2 - a.2*b.1,
+            a.2*b.0 - a.0*b.2,
+            a.0*b.1 - a.1*b.0)
+    }
+}
+
 impl Matrix4x4 {
     pub fn new() -> Matrix4x4 {
 
@@ -85,5 +110,53 @@ impl Matrix4x4 {
         }
 
         Matrix4x4 { values }
+    }
+
+    pub fn look_at(&mut self, eye: Vec3, at: Vec3, up: Vec3) {
+        let forw = Vec3(
+            at.0 - eye.0,
+            at.1 - eye.1,
+            at.2 - eye.2);
+
+        let forw = forw.normalize();
+
+        let side = Vec3::cross(&up, &forw).normalize();
+
+        let up = Vec3::cross(&forw, &side);
+
+        let mut m0 = Matrix4x4::new();
+
+        m0.values[ 0] = side.0;
+        m0.values[ 4] = side.1;
+        m0.values[ 8] = side.2;
+
+        m0.values[ 1] = up.0;
+        m0.values[ 5] = up.1;
+        m0.values[ 9] = up.2;
+
+        m0.values[ 2] = -forw.0;
+        m0.values[ 6] = -forw.1;
+        m0.values[10] = -forw.2;
+
+        let mut m1 = Matrix4x4::new();
+        m1.values[12] = -eye.0;
+        m1.values[13] = -eye.1;
+        m1.values[14] = -eye.2;
+
+        *self = Matrix4x4::multiply(&m1, &m0);
+    }
+
+    pub fn camera_3d(&mut self,
+                     fov: f32, ratio: f32, near: f32, far: f32,
+                     eye: Vec3, at: Vec3, up: Vec3) {
+
+        // Perspective matrix
+        let mut perspective = Matrix4x4::new();
+        perspective.perspective(fov, ratio, near, far);
+
+        let mut look = Matrix4x4::new();
+        look.look_at(eye, at, up);
+
+        *self = Matrix4x4::multiply(&look, &perspective);
     }
 }

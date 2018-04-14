@@ -12,6 +12,7 @@ This library is meant to make this job easier.
  * `lingo::hwbuf`, vertex array buffer handling.
  * `lingo::attribute`, render setup by defining attributes.
  * `lingo::error`, OpenGL error checking.
+ * `lingo::projection`, create projection matrices.
 
 ## Sample
 Have a look at the source code <src/sample.rs>.
