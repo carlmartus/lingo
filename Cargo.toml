@@ -8,5 +8,5 @@ glutin = "0.13"
 gl = "0.10"
 
 [[bin]]
-name = "sample"
-path = "src/sample.rs"
+name = "hello_triangle"
+path = "samples/hello_triangle.rs"
