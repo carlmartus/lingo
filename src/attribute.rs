@@ -12,11 +12,12 @@ pub enum PrimitiveType {
 }
 
 pub enum DataType {
-    U8,
-    U16,
-    U32,
-    F32,
-    F64,
+    // Unsigned
+    U8, U16, U32,
+    // Signed
+    I8, I16, I32,
+    // Floating point
+    F32, F64,
 }
 
 struct Part {
@@ -53,6 +54,9 @@ impl DataType {
             DataType::U8    => gl::UNSIGNED_BYTE,
             DataType::U16   => gl::UNSIGNED_SHORT,
             DataType::U32   => gl::UNSIGNED_INT,
+            DataType::I8    => gl::BYTE,
+            DataType::I16   => gl::SHORT,
+            DataType::I32   => gl::INT,
             DataType::F32   => gl::FLOAT,
             DataType::F64   => gl::DOUBLE,
         }
@@ -63,6 +67,9 @@ impl DataType {
             DataType::U8    => 1,
             DataType::U16   => 2,
             DataType::U32   => 4,
+            DataType::I8    => 1,
+            DataType::I16   => 2,
+            DataType::I32   => 4,
             DataType::F32   => 4,
             DataType::F64   => 8,
         }
