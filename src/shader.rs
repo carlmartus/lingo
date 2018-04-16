@@ -13,6 +13,8 @@ pub struct Program {
     program: GLuint,
 }
 
+pub struct UniformLocation(GLint);
+
 impl Type {
     pub fn to_gl_enum(t: Type) -> GLenum {
         match t {
@@ -63,6 +65,22 @@ impl Program {
         unsafe {
             gl::UseProgram(0);
         }
+    }
+
+    pub fn get_uniform_location(&self, name: &'static str) -> UniformLocation {
+        let location = unsafe {
+            gl::GetUniformLocation(self.program,
+                                   CString::new(name).unwrap().as_ptr())
+        };
+
+        UniformLocation(location)
+    }
+
+    pub fn set_uniform<F>(&self, location: &UniformLocation, cb: F)
+        where F: FnOnce(GLint) {
+
+        self.use_program();
+        cb(location.0);
     }
 }
 

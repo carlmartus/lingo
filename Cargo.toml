@@ -10,3 +10,7 @@ gl = "0.10"
 [[bin]]
 name = "hello_triangle"
 path = "samples/hello_triangle.rs"
+
+[[bin]]
+name = "camera"
+path = "samples/camera.rs"
