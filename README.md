@@ -15,5 +15,6 @@ This library is meant to make this job easier.
  * `lingo::projection`, create projection matrices.
 
 ## Sample
-Have a look at the source code <src/sample.rs>.
-For a small *Hello triangle* program using Lingo.
+ * [Hello triangle](samples/hello_triangle.rs) - *Hello world* but for GPU.
+ * [3D camera](samples/camera.rs) - Using projections to get a 3D camera
+   perspective.
