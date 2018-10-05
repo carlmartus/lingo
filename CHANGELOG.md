@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] 2018-10-05
 ### Added
 - Window builder helper `lingo::window::WindowBuilder`.
+- Example code for stride.
 
 ### Changed
 - Stride usage in hardware buffers.
 - Rename attribute to pipeline.
 - Simplified module paths for crate.
+
+### Fixed
+- Stride didn't work at all.
 
 ## [0.2.0] 2018-04-22
 ### Added
@@ -20,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 3D perspective projection.
 - Return standard Rust results in setup methods.
 - More data types for attributes.
+- Example code for camera.
 
 ## [0.1.0] - 2018-03-24
 ### Added
@@ -27,4 +32,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vertex buffer abstraction `lingo::Attribute`.
 - Shader abstraction `lingo::shader::Program`.
 - Window abstraction `lingo::window::Window`.
-- Hello triangle sample
+- Example code for *Hello triangle*.

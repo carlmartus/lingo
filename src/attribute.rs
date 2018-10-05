@@ -142,7 +142,7 @@ impl Pipeline {
                 gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
 
                 gl::VertexAttribPointer(
-                    p.buffer_id as GLuint,
+                    i as GLuint,
                     p.element_count,
                     p.data_type,
                     p.normalize,
