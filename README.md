@@ -15,6 +15,8 @@ This library is meant to make this job easier.
  * `lingo::projection`, create projection matrices.
 
 ## Sample
- * [Hello triangle](samples/hello_triangle.rs) - *Hello world* but for GPU.
- * [3D camera](samples/camera.rs) - Using projections to get a 3D camera
-   perspective.
+- [Hello triangle](samples/hello_triangle.rs), *Hello world* but for GPU.
+- [3D camera](samples/camera.rs), using projections to get a 3D camera
+  perspective.
+- [Stride](samples/stride.rs), multiple vertex attributes using stride.
+
