@@ -15,6 +15,16 @@ pub struct HwBuf<T> {
     data: Vec<T>,
 }
 
+pub trait HwBufReference {
+    fn get_gl_buffer(&self) -> GLuint;
+}
+
+impl<T> HwBufReference for HwBuf<T> {
+    fn get_gl_buffer(&self) -> GLuint {
+        self.gl_vbo
+    }
+}
+
 impl Usage {
     pub fn to_gl_enum(&self) -> GLenum {
         match *self {

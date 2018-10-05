@@ -1,6 +1,7 @@
 extern crate gl;
 
 use gl::types::{GLboolean, GLenum, GLint, GLuint};
+use hwbuf::HwBufReference;
 
 pub enum PrimitiveType {
     Points,
@@ -33,11 +34,15 @@ struct Part {
     normalize: GLboolean,
 }
 
-pub struct Attribute {
+struct BufferReference {
+    gl_buffer: GLuint,
+    stride: usize,
+}
+
+pub struct Pipeline {
     draw_type: GLenum,
     parts: Vec<Part>,
-    buffers: Vec<GLuint>,
-    stride: GLint,
+    buffers: Vec<BufferReference>,
 }
 
 impl PrimitiveType {
@@ -81,13 +86,12 @@ impl DataType {
     }
 }
 
-impl Attribute {
-    pub fn new(stride: usize, primitive_type: PrimitiveType) -> Result<Attribute, String> {
-        Ok(Attribute {
+impl Pipeline {
+    pub fn new(primitive_type: PrimitiveType) -> Result<Pipeline, String> {
+        Ok(Pipeline {
             draw_type: PrimitiveType::to_gl_enum(primitive_type),
             parts: Vec::new(),
             buffers: Vec::new(),
-            stride: stride as GLint,
         })
     }
 
@@ -115,9 +119,12 @@ impl Attribute {
         });
     }
 
-    pub fn push_buffer(&mut self, buffer_id: GLuint) -> usize {
+    pub fn push_buffer(&mut self, hw: &HwBufReference, stride: usize) -> usize {
         let index = self.buffers.len();
-        self.buffers.push(buffer_id);
+        self.buffers.push(BufferReference {
+            gl_buffer: hw.get_gl_buffer(),
+            stride,
+        });
         index
     }
 
@@ -130,7 +137,8 @@ impl Attribute {
             unsafe {
                 gl::EnableVertexAttribArray(i);
 
-                let buffer_id = self.buffers[p.buffer_id];
+                let buffer_id = self.buffers[p.buffer_id].gl_buffer;
+                let buffer_stride = self.buffers[p.buffer_id].stride;
                 gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
 
                 gl::VertexAttribPointer(
@@ -138,7 +146,7 @@ impl Attribute {
                     p.element_count,
                     p.data_type,
                     p.normalize,
-                    self.stride,
+                    buffer_stride as i32,
                     offset as *const gl::types::GLvoid,
                 );
                 offset += p.size;

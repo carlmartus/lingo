@@ -1,6 +1,6 @@
 extern crate lingo;
 
-use lingo::attribute::{Attribute, DataType, PrimitiveType};
+use lingo::attribute::{DataType, Pipeline, PrimitiveType};
 use lingo::hwbuf::{HwBuf, Usage};
 use lingo::shader::Program;
 use lingo::window::{Command, Peripheral, Window, WindowBuilder};
@@ -32,7 +32,7 @@ struct Sample {
     win: Window,
     prog: Program,
     verts: HwBuf<Vertex>,
-    attribs: Attribute,
+    pipeline: Pipeline,
 }
 
 fn main() {
@@ -62,9 +62,9 @@ impl Sample {
         verts.prepear_graphics();
 
         // Describe rendering attributes
-        let mut attribs = Attribute::new(8, PrimitiveType::Triangles)?;
-        attribs.push_buffer(verts.get_gl_id());
-        attribs.push_attribute(0, 2, DataType::F32, false);
+        let mut pipeline = Pipeline::new(PrimitiveType::Triangles)?;
+        let buf_id = pipeline.push_buffer(&verts, 0);
+        pipeline.push_attribute(buf_id, 2, DataType::F32, false);
 
         // Did any error occur?
         error::print_gl_error()?;
@@ -77,7 +77,7 @@ impl Sample {
             win,
             prog,
             verts,
-            attribs,
+            pipeline,
         })
     }
 
@@ -107,7 +107,7 @@ impl Sample {
 
             self.prog.use_program();
             self.verts.bind();
-            self.attribs.draw(3);
+            self.pipeline.draw(3);
 
             error::print_gl_error().unwrap();
 

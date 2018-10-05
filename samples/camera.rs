@@ -1,6 +1,6 @@
 extern crate lingo;
 
-use lingo::attribute::{Attribute, DataType, PrimitiveType};
+use lingo::attribute::{DataType, Pipeline, PrimitiveType};
 use lingo::hwbuf::{HwBuf, Usage};
 use lingo::projection::{Matrix4x4, Vec3};
 use lingo::shader::{Program, UniformLocation};
@@ -34,7 +34,7 @@ struct Camera {
     win: Window,
     prog: Program,
     verts: HwBuf<Vertex>,
-    attribs: Attribute,
+    pipeline: Pipeline,
     location_mvp: UniformLocation,
 }
 
@@ -61,9 +61,9 @@ impl Camera {
         verts.push(Vertex(0, 1));
         verts.prepear_graphics();
 
-        let mut attribs = Attribute::new(4, PrimitiveType::Triangles)?;
-        attribs.push_buffer(verts.get_gl_id());
-        attribs.push_attribute(0, 2, DataType::I16, false);
+        let mut pipeline = Pipeline::new(PrimitiveType::Triangles)?;
+        let buf_id = pipeline.push_buffer(&verts, 0);
+        pipeline.push_attribute(buf_id, 2, DataType::I16, false);
 
         let location_mvp = prog.get_uniform_location("un_mvp");
 
@@ -77,7 +77,7 @@ impl Camera {
             win,
             prog,
             verts,
-            attribs,
+            pipeline,
             location_mvp,
         })
     }
@@ -120,7 +120,7 @@ impl Camera {
             });
 
             self.verts.bind();
-            self.attribs.draw(3);
+            self.pipeline.draw(3);
             self.win.swap_buffers();
             error::print_gl_error().unwrap();
         }
