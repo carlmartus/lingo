@@ -4,25 +4,11 @@ use gl::types::{GLchar, GLenum, GLint, GLuint};
 use std::ffi::CString;
 use std::{ffi, ptr, str};
 
-pub enum Type {
-    Vertex,
-    Fragment,
-}
-
 pub struct Program {
     program: GLuint,
 }
 
 pub struct UniformLocation(GLint);
-
-impl Type {
-    pub fn to_gl_enum(t: Type) -> GLenum {
-        match t {
-            Type::Vertex => gl::VERTEX_SHADER,
-            Type::Fragment => gl::FRAGMENT_SHADER,
-        }
-    }
-}
 
 impl Program {
     pub fn from_static(

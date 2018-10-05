@@ -1,11 +1,6 @@
 extern crate lingo;
 
-use lingo::attribute::{DataType, Pipeline, PrimitiveType};
-use lingo::hwbuf::{HwBuf, Usage};
-use lingo::projection::{Matrix4x4, Vec3};
-use lingo::shader::{Program, UniformLocation};
-use lingo::window::{Command, Window, WindowBuilder};
-use lingo::{error, gl};
+use lingo::{draw, gl, window};
 
 const CAMERA_VERT: &'static str = r#"
 #version 100
@@ -31,11 +26,11 @@ void main() {
 struct Vertex(i16, i16);
 
 struct Camera {
-    win: Window,
-    prog: Program,
-    verts: HwBuf<Vertex>,
-    pipeline: Pipeline,
-    location_mvp: UniformLocation,
+    win: window::Window,
+    prog: draw::Program,
+    verts: draw::HwBuf<Vertex>,
+    pipeline: draw::Pipeline,
+    location_mvp: draw::UniformLocation,
 }
 
 fn main() {
@@ -50,24 +45,24 @@ impl Camera {
         // Create environment
         // Se hello_triangle.rs for description of this part
 
-        let win = WindowBuilder::new()
+        let win = window::WindowBuilder::new()
             .with_title("dialog".to_string())
             .build()?;
 
-        let prog = Program::from_static(CAMERA_VERT, CAMERA_FRAG, &["at_loc"])?;
-        let mut verts = HwBuf::new(5, Usage::Static)?;
+        let prog = draw::Program::from_static(CAMERA_VERT, CAMERA_FRAG, &["at_loc"])?;
+        let mut verts = draw::HwBuf::new(5, draw::Usage::Static)?;
         verts.push(Vertex(0, 0));
         verts.push(Vertex(1, 0));
         verts.push(Vertex(0, 1));
         verts.prepear_graphics();
 
-        let mut pipeline = Pipeline::new(PrimitiveType::Triangles)?;
+        let mut pipeline = draw::Pipeline::new(draw::PrimitiveType::Triangles)?;
         let buf_id = pipeline.push_buffer(&verts, 0);
-        pipeline.push_attribute(buf_id, 2, DataType::I16, false);
+        pipeline.push_attribute(buf_id, 2, draw::DataType::I16, false);
 
         let location_mvp = prog.get_uniform_location("un_mvp");
 
-        error::print_gl_error()?;
+        draw::print_gl_error()?;
 
         unsafe {
             gl::ClearColor(0.3, 0.4, 0.5, 1.0);
@@ -89,7 +84,7 @@ impl Camera {
             // Command events
             while let Some(c) = self.win.next_command() {
                 match c {
-                    Command::Quit => break 'gameloop,
+                    window::Command::Quit => break 'gameloop,
                     _ => (),
                 }
             }
@@ -98,7 +93,7 @@ impl Camera {
                 gl::Clear(gl::COLOR_BUFFER_BIT);
             }
 
-            let mut mat = Matrix4x4::new();
+            let mut mat = draw::Matrix4x4::new();
 
             // 2D Orthogonal mode
             //mat.ortho(-4f32, -3f32, 4f32, 3f32);
@@ -109,9 +104,9 @@ impl Camera {
                 1.3333f32,
                 0.1f32,
                 20f32,
-                Vec3(2f32, 1f32, 1f32), // Eye
-                Vec3(0f32, 0f32, 0f32), // At
-                Vec3(0f32, 0f32, 1f32),
+                draw::Vec3(2f32, 1f32, 1f32), // Eye
+                draw::Vec3(0f32, 0f32, 0f32), // At
+                draw::Vec3(0f32, 0f32, 1f32),
             ); // Center
 
             self.prog.use_program();
@@ -122,7 +117,7 @@ impl Camera {
             self.verts.bind();
             self.pipeline.draw(3);
             self.win.swap_buffers();
-            error::print_gl_error().unwrap();
+            draw::print_gl_error().unwrap();
         }
     }
 }

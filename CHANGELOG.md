@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Stride usage in hardware buffers.
 - Rename attribute to pipeline.
+- Simplified module paths for crate.
 
 ## [0.2.0] 2018-04-22
 ### Added

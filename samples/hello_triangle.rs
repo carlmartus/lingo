@@ -1,10 +1,6 @@
 extern crate lingo;
 
-use lingo::attribute::{DataType, Pipeline, PrimitiveType};
-use lingo::hwbuf::{HwBuf, Usage};
-use lingo::shader::Program;
-use lingo::window::{Command, Peripheral, Window, WindowBuilder};
-use lingo::{error, gl};
+use lingo::{draw, gl, window};
 
 const RED_VERT: &'static str = r#"
 #version 100
@@ -29,10 +25,10 @@ void main() {
 struct Vertex(f32, f32);
 
 struct Sample {
-    win: Window,
-    prog: Program,
-    verts: HwBuf<Vertex>,
-    pipeline: Pipeline,
+    win: window::Window,
+    prog: draw::Program,
+    verts: draw::HwBuf<Vertex>,
+    pipeline: draw::Pipeline,
 }
 
 fn main() {
@@ -45,15 +41,15 @@ fn main() {
 impl Sample {
     pub fn new() -> Result<Sample, String> {
         // Create window
-        let win = WindowBuilder::new()
+        let win = window::WindowBuilder::new()
             .with_title("dialog".to_string())
             .build()?;
 
         // Create shader program from source
-        let prog = Program::from_static(RED_VERT, RED_FRAG, &["at_loc"])?;
+        let prog = draw::Program::from_static(RED_VERT, RED_FRAG, &["at_loc"])?;
 
         // Create buffer for geometry
-        let mut verts = HwBuf::new(10, Usage::Static)?;
+        let mut verts = draw::HwBuf::new(10, draw::Usage::Static)?;
 
         // Fill buffer with a triangle
         verts.push(Vertex(0.0, 0.0));
@@ -62,12 +58,12 @@ impl Sample {
         verts.prepear_graphics();
 
         // Describe rendering attributes
-        let mut pipeline = Pipeline::new(PrimitiveType::Triangles)?;
+        let mut pipeline = draw::Pipeline::new(draw::PrimitiveType::Triangles)?;
         let buf_id = pipeline.push_buffer(&verts, 0);
-        pipeline.push_attribute(buf_id, 2, DataType::F32, false);
+        pipeline.push_attribute(buf_id, 2, draw::DataType::F32, false);
 
         // Did any error occur?
-        error::print_gl_error()?;
+        draw::print_gl_error()?;
 
         unsafe {
             gl::ClearColor(0.3, 0.4, 0.5, 1.0);
@@ -88,7 +84,7 @@ impl Sample {
             // Command events
             while let Some(c) = self.win.next_command() {
                 match c {
-                    Command::Quit => break 'gameloop,
+                    window::Command::Quit => break 'gameloop,
                     _ => (),
                 }
             }
@@ -96,7 +92,7 @@ impl Sample {
             // Peripheral events
             while let Some(p) = self.win.next_peripheral() {
                 match p {
-                    Peripheral::MousePosition(_, _) => (),
+                    window::Peripheral::MousePosition(_, _) => (),
                     //_ => (),
                 }
             }
@@ -109,7 +105,7 @@ impl Sample {
             self.verts.bind();
             self.pipeline.draw(3);
 
-            error::print_gl_error().unwrap();
+            draw::print_gl_error().unwrap();
 
             self.win.swap_buffers();
         }
