@@ -1,8 +1,8 @@
 extern crate gl;
 
-use std::{ffi, ptr, str};
-use gl::types::{GLint, GLuint, GLchar, GLenum};
+use gl::types::{GLchar, GLenum, GLint, GLuint};
 use std::ffi::CString;
+use std::{ffi, ptr, str};
 
 pub enum Type {
     Vertex,
@@ -18,17 +18,18 @@ pub struct UniformLocation(GLint);
 impl Type {
     pub fn to_gl_enum(t: Type) -> GLenum {
         match t {
-            Type::Vertex    => gl::VERTEX_SHADER,
-            Type::Fragment  => gl::FRAGMENT_SHADER,
+            Type::Vertex => gl::VERTEX_SHADER,
+            Type::Fragment => gl::FRAGMENT_SHADER,
         }
     }
 }
 
 impl Program {
     pub fn from_static(
-        vert_src: &'static str, frag_src: &'static str,
-        attribute_binds: &[&'static str]) ->
-    Result<Program, String> {
+        vert_src: &'static str,
+        frag_src: &'static str,
+        attribute_binds: &[&'static str],
+    ) -> Result<Program, String> {
         let id_vert = create_shader(gl::VERTEX_SHADER, vert_src.to_string())?;
         let id_frag = create_shader(gl::FRAGMENT_SHADER, frag_src.to_string())?;
 
@@ -43,16 +44,15 @@ impl Program {
                 gl::BindAttribLocation(
                     program,
                     i as GLuint,
-                    CString::new(*attribute).unwrap().as_ptr());
+                    CString::new(*attribute).unwrap().as_ptr(),
+                );
             }
 
             gl::DeleteShader(id_vert);
             gl::DeleteShader(id_frag);
         }
 
-        Ok(Program {
-            program,
-        })
+        Ok(Program { program })
     }
 
     pub fn use_program(&self) {
@@ -68,17 +68,16 @@ impl Program {
     }
 
     pub fn get_uniform_location(&self, name: &'static str) -> UniformLocation {
-        let location = unsafe {
-            gl::GetUniformLocation(self.program,
-                                   CString::new(name).unwrap().as_ptr())
-        };
+        let location =
+            unsafe { gl::GetUniformLocation(self.program, CString::new(name).unwrap().as_ptr()) };
 
         UniformLocation(location)
     }
 
     pub fn set_uniform<F>(&self, location: &UniformLocation, cb: F)
-        where F: FnOnce(GLint) {
-
+    where
+        F: FnOnce(GLint),
+    {
         self.use_program();
         cb(location.0);
     }
@@ -100,12 +99,7 @@ fn create_shader(type_enum: GLenum, src: String) -> Result<GLuint, String> {
             gl::GetShaderiv(id, gl::INFO_LOG_LENGTH, &mut len);
             let mut buf = Vec::with_capacity(len as usize);
             buf.set_len((len as usize) - 1);
-            gl::GetShaderInfoLog(
-                id,
-                len,
-                ptr::null_mut(),
-                buf.as_mut_ptr() as *mut GLchar,
-                );
+            gl::GetShaderInfoLog(id, len, ptr::null_mut(), buf.as_mut_ptr() as *mut GLchar);
 
             Err(str::from_utf8(&buf).unwrap().to_string())
         } else {

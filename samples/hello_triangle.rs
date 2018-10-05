@@ -1,10 +1,10 @@
 extern crate lingo;
 
-use lingo::window::{Window, Command, Peripheral};
-use lingo::shader::Program;
+use lingo::attribute::{Attribute, DataType, PrimitiveType};
 use lingo::hwbuf::{HwBuf, Usage};
-use lingo::attribute::{Attribute, PrimitiveType, DataType};
-use lingo::{gl, error};
+use lingo::shader::Program;
+use lingo::window::{Command, Peripheral, Window, WindowBuilder};
+use lingo::{error, gl};
 
 const RED_VERT: &'static str = r#"
 #version 100
@@ -45,7 +45,9 @@ fn main() {
 impl Sample {
     pub fn new() -> Result<Sample, String> {
         // Create window
-        let win = Window::new("dialog")?;
+        let win = WindowBuilder::new()
+            .with_title("dialog".to_string())
+            .build()?;
 
         // Create shader program from source
         let prog = Program::from_static(RED_VERT, RED_FRAG, &["at_loc"])?;
@@ -72,7 +74,10 @@ impl Sample {
         }
 
         Ok(Sample {
-            win, prog, verts, attribs,
+            win,
+            prog,
+            verts,
+            attribs,
         })
     }
 
@@ -83,8 +88,7 @@ impl Sample {
             // Command events
             while let Some(c) = self.win.next_command() {
                 match c {
-                    Command::Quit =>
-                        break 'gameloop,
+                    Command::Quit => break 'gameloop,
                     _ => (),
                 }
             }

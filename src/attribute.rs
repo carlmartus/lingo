@@ -1,6 +1,6 @@
 extern crate gl;
 
-use gl::types::{GLuint, GLint, GLenum, GLboolean};
+use gl::types::{GLboolean, GLenum, GLint, GLuint};
 
 pub enum PrimitiveType {
     Points,
@@ -13,11 +13,16 @@ pub enum PrimitiveType {
 
 pub enum DataType {
     // Unsigned
-    U8, U16, U32,
+    U8,
+    U16,
+    U32,
     // Signed
-    I8, I16, I32,
+    I8,
+    I16,
+    I32,
     // Floating point
-    F32, F64,
+    F32,
+    F64,
 }
 
 struct Part {
@@ -38,12 +43,12 @@ pub struct Attribute {
 impl PrimitiveType {
     pub fn to_gl_enum(t: PrimitiveType) -> GLenum {
         match t {
-            PrimitiveType::Points          => gl::POINTS,
-            PrimitiveType::Lines           => gl::LINES,
-            PrimitiveType::Triangles       => gl::TRIANGLES,
-            PrimitiveType::TriangleFan     => gl::TRIANGLE_FAN,
-            PrimitiveType::TriangleStrip   => gl::TRIANGLE_STRIP,
-            PrimitiveType::Quads           => gl::QUADS,
+            PrimitiveType::Points => gl::POINTS,
+            PrimitiveType::Lines => gl::LINES,
+            PrimitiveType::Triangles => gl::TRIANGLES,
+            PrimitiveType::TriangleFan => gl::TRIANGLE_FAN,
+            PrimitiveType::TriangleStrip => gl::TRIANGLE_STRIP,
+            PrimitiveType::Quads => gl::QUADS,
         }
     }
 }
@@ -51,27 +56,27 @@ impl PrimitiveType {
 impl DataType {
     pub fn to_gl_enum(&self) -> GLenum {
         match *self {
-            DataType::U8    => gl::UNSIGNED_BYTE,
-            DataType::U16   => gl::UNSIGNED_SHORT,
-            DataType::U32   => gl::UNSIGNED_INT,
-            DataType::I8    => gl::BYTE,
-            DataType::I16   => gl::SHORT,
-            DataType::I32   => gl::INT,
-            DataType::F32   => gl::FLOAT,
-            DataType::F64   => gl::DOUBLE,
+            DataType::U8 => gl::UNSIGNED_BYTE,
+            DataType::U16 => gl::UNSIGNED_SHORT,
+            DataType::U32 => gl::UNSIGNED_INT,
+            DataType::I8 => gl::BYTE,
+            DataType::I16 => gl::SHORT,
+            DataType::I32 => gl::INT,
+            DataType::F32 => gl::FLOAT,
+            DataType::F64 => gl::DOUBLE,
         }
     }
 
     pub fn size(&self) -> usize {
         match *self {
-            DataType::U8    => 1,
-            DataType::U16   => 2,
-            DataType::U32   => 4,
-            DataType::I8    => 1,
-            DataType::I16   => 2,
-            DataType::I32   => 4,
-            DataType::F32   => 4,
-            DataType::F64   => 8,
+            DataType::U8 => 1,
+            DataType::U16 => 2,
+            DataType::U32 => 4,
+            DataType::I8 => 1,
+            DataType::I16 => 2,
+            DataType::I32 => 4,
+            DataType::F32 => 4,
+            DataType::F64 => 8,
         }
     }
 }
@@ -87,16 +92,18 @@ impl Attribute {
     }
 
     pub fn push_attribute(
-        &mut self, buffer_id: usize, element_count: usize,
+        &mut self,
+        buffer_id: usize,
+        element_count: usize,
         data_type: DataType,
-        normalize: bool) {
-
+        normalize: bool,
+    ) {
         let normalize = match normalize {
             true => gl::TRUE,
             false => gl::FALSE,
         };
 
-        let size = data_type.size()*element_count;
+        let size = data_type.size() * element_count;
         let data_type = data_type.to_gl_enum();
 
         self.parts.push(Part {
@@ -127,10 +134,13 @@ impl Attribute {
                 gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
 
                 gl::VertexAttribPointer(
-                    p.buffer_id as GLuint, p.element_count,
-                    p.data_type, p.normalize,
+                    p.buffer_id as GLuint,
+                    p.element_count,
+                    p.data_type,
+                    p.normalize,
                     self.stride,
-                    offset as *const gl::types::GLvoid);
+                    offset as *const gl::types::GLvoid,
+                );
                 offset += p.size;
             }
         }

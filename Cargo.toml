@@ -1,16 +1,16 @@
 [package]
 name = "lingo"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Martin Sandgren <carlmartus@gmail.com>"]
 
 [dependencies]
 glutin = "0.13"
 gl = "0.10"
 
-[[bin]]
+[[example]]
 name = "hello_triangle"
 path = "samples/hello_triangle.rs"
 
-[[bin]]
+[[example]]
 name = "camera"
 path = "samples/camera.rs"

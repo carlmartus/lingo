@@ -1,11 +1,11 @@
 extern crate lingo;
 
-use lingo::window::{Window, Command};
-use lingo::shader::{Program, UniformLocation};
+use lingo::attribute::{Attribute, DataType, PrimitiveType};
 use lingo::hwbuf::{HwBuf, Usage};
-use lingo::attribute::{Attribute, PrimitiveType, DataType};
 use lingo::projection::{Matrix4x4, Vec3};
-use lingo::{gl, error};
+use lingo::shader::{Program, UniformLocation};
+use lingo::window::{Command, Window, WindowBuilder};
+use lingo::{error, gl};
 
 const CAMERA_VERT: &'static str = r#"
 #version 100
@@ -50,9 +50,11 @@ impl Camera {
         // Create environment
         // Se hello_triangle.rs for description of this part
 
-        let win = Window::new("dialog")?;
-        let prog = Program::from_static(CAMERA_VERT, CAMERA_FRAG,
-                                        &["at_loc"])?;
+        let win = WindowBuilder::new()
+            .with_title("dialog".to_string())
+            .build()?;
+
+        let prog = Program::from_static(CAMERA_VERT, CAMERA_FRAG, &["at_loc"])?;
         let mut verts = HwBuf::new(5, Usage::Static)?;
         verts.push(Vertex(0, 0));
         verts.push(Vertex(1, 0));
@@ -72,7 +74,11 @@ impl Camera {
         }
 
         Ok(Camera {
-            win, prog, verts, attribs, location_mvp,
+            win,
+            prog,
+            verts,
+            attribs,
+            location_mvp,
         })
     }
 
@@ -83,8 +89,7 @@ impl Camera {
             // Command events
             while let Some(c) = self.win.next_command() {
                 match c {
-                    Command::Quit =>
-                        break 'gameloop,
+                    Command::Quit => break 'gameloop,
                     _ => (),
                 }
             }
@@ -99,17 +104,19 @@ impl Camera {
             //mat.ortho(-4f32, -3f32, 4f32, 3f32);
 
             // 3D camera mode
-            mat.camera_3d(1.3f32, 1.3333f32, 0.1f32, 20f32,
-                          Vec3(2f32, 1f32, 1f32), // Eye
-                          Vec3(0f32, 0f32, 0f32), // At
-                          Vec3(0f32, 0f32, 1f32)); // Center
+            mat.camera_3d(
+                1.3f32,
+                1.3333f32,
+                0.1f32,
+                20f32,
+                Vec3(2f32, 1f32, 1f32), // Eye
+                Vec3(0f32, 0f32, 0f32), // At
+                Vec3(0f32, 0f32, 1f32),
+            ); // Center
 
             self.prog.use_program();
-            self.prog.set_uniform(&self.location_mvp, |loc| {
-                unsafe {
-                    gl::UniformMatrix4fv(loc, 1, gl::FALSE,
-                                         mat.values.as_ptr());
-                }
+            self.prog.set_uniform(&self.location_mvp, |loc| unsafe {
+                gl::UniformMatrix4fv(loc, 1, gl::FALSE, mat.values.as_ptr());
             });
 
             self.verts.bind();

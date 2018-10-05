@@ -1,7 +1,7 @@
 extern crate gl;
 extern crate glutin;
-use glutin::{EventsLoop, GlWindow};
 use glutin::GlContext;
+use glutin::{EventsLoop, GlWindow};
 use std::collections::vec_deque::VecDeque;
 
 const QUEUE_LEN: usize = 20;
@@ -31,12 +31,18 @@ pub struct Window {
     queue_command: VecDeque<Command>,
 }
 
+pub struct WindowBuilder {
+    title: Option<String>,
+    w: u32,
+    h: u32,
+}
+
 impl Window {
-    pub fn new(title: &'static str) -> Result<Window, String> {
+    pub fn new(title: String, w: u32, h: u32) -> Result<Window, String> {
         let events_loop = glutin::EventsLoop::new();
         let window = glutin::WindowBuilder::new()
             .with_title(title)
-            .with_dimensions(120, 90);
+            .with_dimensions(w, h);
         let context = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
             .with_vsync(true);
@@ -44,14 +50,13 @@ impl Window {
 
         unsafe {
             gl_window.make_current().unwrap();
-            gl::load_with(|symbol| {
-                gl_window.get_proc_address(symbol) as *const _
-            });
+            gl::load_with(|symbol| gl_window.get_proc_address(symbol) as *const _);
             //gl::ClearColor(0.0, 1.0, 0.0, 1.0);
         }
 
         Ok(Window {
-            events_loop, gl_window,
+            events_loop,
+            gl_window,
             queue_peripheral: VecDeque::with_capacity(QUEUE_LEN),
             queue_command: VecDeque::with_capacity(QUEUE_LEN),
         })
@@ -72,26 +77,24 @@ impl Window {
         //self.events_loop.poll_events(|event| {
         el.poll_events(|event| {
             match match event {
-                glutin::Event::WindowEvent{ event, .. } => match event {
-                    glutin::WindowEvent::Closed =>
-                        GlutinEvent::Command(Command::Quit),
-                    glutin::WindowEvent::Resized(w, h) =>
-                        GlutinEvent::Command(Command::WinResize(w, h)),
-                    glutin::WindowEvent::CursorMoved{ position, .. } =>
-                        GlutinEvent::Peripheral(Peripheral::MousePosition(
-                                position.0 as f32, position.1 as f32)),
+                glutin::Event::WindowEvent { event, .. } => match event {
+                    glutin::WindowEvent::Closed => GlutinEvent::Command(Command::Quit),
+                    glutin::WindowEvent::Resized(w, h) => {
+                        GlutinEvent::Command(Command::WinResize(w, h))
+                    }
+                    glutin::WindowEvent::CursorMoved { position, .. } => GlutinEvent::Peripheral(
+                        Peripheral::MousePosition(position.0 as f32, position.1 as f32),
+                    ),
                     _ => GlutinEvent::None,
                 },
                 _ => GlutinEvent::None,
             } {
-                GlutinEvent::Command(c) =>
-                    if qc.len() < QUEUE_LEN {
-                        qc.push_back(c);
-                    },
-                GlutinEvent::Peripheral(p) =>
-                    if qp.len() < QUEUE_LEN {
-                        qp.push_back(p);
-                    },
+                GlutinEvent::Command(c) => if qc.len() < QUEUE_LEN {
+                    qc.push_back(c);
+                },
+                GlutinEvent::Peripheral(p) => if qp.len() < QUEUE_LEN {
+                    qp.push_back(p);
+                },
                 _ => (),
             }
         });
@@ -103,5 +106,35 @@ impl Window {
 
     pub fn next_command(&mut self) -> Option<Command> {
         self.queue_command.pop_front()
+    }
+}
+
+impl WindowBuilder {
+    pub fn new() -> WindowBuilder {
+        WindowBuilder {
+            title: None,
+            w: 640,
+            h: 480,
+        }
+    }
+
+    pub fn with_title(mut self, title: String) -> WindowBuilder {
+        self.title = Some(title);
+        self
+    }
+
+    pub fn with_dimensions(mut self, w: u32, h: u32) -> WindowBuilder {
+        self.w = w;
+        self.h = h;
+        self
+    }
+
+    pub fn build(self) -> Result<Window, String> {
+        let title_str = match self.title {
+            Some(s) => s,
+            None => "Lingo window".to_string(),
+        };
+
+        Window::new(title_str, self.w, self.h)
     }
 }

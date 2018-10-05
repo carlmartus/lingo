@@ -1,8 +1,8 @@
 extern crate gl;
 
+use gl::types::{GLenum, GLuint};
 use std::vec::Vec;
 use std::{mem, ptr};
-use gl::types::{GLuint, GLenum};
 
 pub enum Usage {
     Stream,
@@ -18,9 +18,9 @@ pub struct HwBuf<T> {
 impl Usage {
     pub fn to_gl_enum(&self) -> GLenum {
         match *self {
-            Usage::Stream   => gl::STREAM_DRAW,
-            Usage::Static   => gl::STATIC_DRAW,
-            Usage::Dynamic  => gl::DYNAMIC_DRAW,
+            Usage::Stream => gl::STREAM_DRAW,
+            Usage::Static => gl::STATIC_DRAW,
+            Usage::Dynamic => gl::DYNAMIC_DRAW,
         }
     }
 }
@@ -33,8 +33,7 @@ impl<T> HwBuf<T> {
             let max_size: isize = (max_verts * mem::size_of::<T>()) as isize;
             gl::GenBuffers(1, &mut gl_vbo);
             gl::BindBuffer(gl::ARRAY_BUFFER, gl_vbo);
-            gl::BufferData( gl::ARRAY_BUFFER, max_size,
-                            ptr::null(), usage.to_gl_enum());
+            gl::BufferData(gl::ARRAY_BUFFER, max_size, ptr::null(), usage.to_gl_enum());
         };
 
         Ok(HwBuf {
@@ -64,13 +63,14 @@ impl<T> HwBuf<T> {
     }
 
     pub fn prepear_graphics(&self) {
-        if self.data.len() == 0 { return }
+        if self.data.len() == 0 {
+            return;
+        }
 
         unsafe {
             let tot_size = (self.data.len() * mem::size_of::<T>()) as isize;
             gl::BindBuffer(gl::ARRAY_BUFFER, self.gl_vbo);
-            gl::BufferSubData(gl::ARRAY_BUFFER, 0, tot_size,
-                              mem::transmute(&self.data[0]));
+            gl::BufferSubData(gl::ARRAY_BUFFER, 0, tot_size, mem::transmute(&self.data[0]));
         }
     }
 
