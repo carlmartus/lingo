@@ -23,8 +23,8 @@ enum GlutinEvent {
 
 pub struct Window {
     // Glutin releated
-    events_loop: EventsLoop,
-    gl_window: GlWindow,
+    pub events_loop: EventsLoop,
+    pub gl_window: GlWindow,
 
     // Command queue
     queue_peripheral: VecDeque<Peripheral>,
