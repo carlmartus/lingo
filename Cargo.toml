@@ -2,6 +2,7 @@
 name = "lingo"
 version = "0.3.0"
 authors = ["Martin Sandgren <carlmartus@gmail.com>"]
+edition = "2015"
 
 [dependencies]
 glutin = "0.13"
