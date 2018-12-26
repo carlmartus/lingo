@@ -5,8 +5,8 @@ authors = ["Martin Sandgren <carlmartus@gmail.com>"]
 edition = "2015"
 
 [dependencies]
-glutin = "0.13"
-gl = "0.10"
+glutin = "0.19"
+gl = "0.11"
 
 [[example]]
 name = "hello_triangle"

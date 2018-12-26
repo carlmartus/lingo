@@ -1,6 +1,6 @@
 extern crate gl;
 extern crate glutin;
-use glutin::GlContext;
+use glutin::{GlContext, dpi};
 use glutin::{EventsLoop, GlWindow};
 use std::collections::vec_deque::VecDeque;
 
@@ -42,7 +42,7 @@ impl Window {
         let events_loop = glutin::EventsLoop::new();
         let window = glutin::WindowBuilder::new()
             .with_title(title)
-            .with_dimensions(w, h);
+            .with_dimensions(dpi::LogicalSize::new(w as f64, h as f64));
         let context = glutin::ContextBuilder::new()
             .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGlEs, (2, 0)))
             .with_vsync(true);
@@ -78,12 +78,12 @@ impl Window {
         el.poll_events(|event| {
             match match event {
                 glutin::Event::WindowEvent { event, .. } => match event {
-                    glutin::WindowEvent::Closed => GlutinEvent::Command(Command::Quit),
-                    glutin::WindowEvent::Resized(w, h) => {
-                        GlutinEvent::Command(Command::WinResize(w, h))
+                    glutin::WindowEvent::CloseRequested => GlutinEvent::Command(Command::Quit),
+                    glutin::WindowEvent::Resized(size) => {
+                        GlutinEvent::Command(Command::WinResize(size.width as u32, size.height as u32))
                     }
                     glutin::WindowEvent::CursorMoved { position, .. } => GlutinEvent::Peripheral(
-                        Peripheral::MousePosition(position.0 as f32, position.1 as f32),
+                        Peripheral::MousePosition(position.x as f32, position.y as f32),
                     ),
                     _ => GlutinEvent::None,
                 },
