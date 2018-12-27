@@ -96,7 +96,7 @@ impl Sample {
             while let Some(p) = self.win.next_peripheral() {
                 match p {
                     window::Peripheral::MousePosition(_, _) => (),
-                    //_ => (),
+                    _ => (),
                 }
             }
 

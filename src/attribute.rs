@@ -1,7 +1,7 @@
 extern crate gl;
 
-use gl::types::{GLboolean, GLenum, GLint, GLuint};
 use crate::hwbuf::HwBufReference;
+use gl::types::{GLboolean, GLenum, GLint, GLuint};
 
 pub enum PrimitiveType {
     Points,

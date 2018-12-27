@@ -1,24 +1,35 @@
 extern crate gl;
 extern crate glutin;
-use glutin::{GlContext, dpi};
+use glutin::{dpi, GlContext};
 use glutin::{EventsLoop, GlWindow};
 use std::collections::vec_deque::VecDeque;
 
+pub use glutin::MouseButton;
+pub use glutin::VirtualKeyCode;
+
 const QUEUE_LEN: usize = 20;
+
+type PeripheralQueue = VecDeque<Peripheral>;
+type CommandQueue = VecDeque<Command>;
+
+pub enum ButtonId {
+    Keyboard {
+        vcode: VirtualKeyCode,
+        scancode: u32,
+    },
+    Mouse {
+        vcode: MouseButton,
+    },
+}
 
 pub enum Peripheral {
     MousePosition(f32, f32),
+    Button(ButtonId, bool),
 }
 
 pub enum Command {
     Quit,
     WinResize(u32, u32),
-}
-
-enum GlutinEvent {
-    Peripheral(Peripheral),
-    Command(Command),
-    None,
 }
 
 pub struct Window {
@@ -27,8 +38,8 @@ pub struct Window {
     pub gl_window: GlWindow,
 
     // Command queue
-    queue_peripheral: VecDeque<Peripheral>,
-    queue_command: VecDeque<Command>,
+    queue_peripheral: PeripheralQueue,
+    queue_command: CommandQueue,
 }
 
 pub struct WindowBuilder {
@@ -51,7 +62,6 @@ impl Window {
         unsafe {
             gl_window.make_current().unwrap();
             gl::load_with(|symbol| gl_window.get_proc_address(symbol) as *const _);
-            //gl::ClearColor(0.0, 1.0, 0.0, 1.0);
         }
 
         Ok(Window {
@@ -66,37 +76,36 @@ impl Window {
         self.gl_window.swap_buffers().unwrap();
     }
 
+    fn translate_glutin_window_event(
+        event: &glutin::WindowEvent,
+        peripherals: &mut PeripheralQueue,
+        commands: &mut CommandQueue,
+    ) {
+        match event {
+            glutin::WindowEvent::CloseRequested => commands.push_back(Command::Quit),
+            glutin::WindowEvent::Resized(size) => {
+                commands.push_back(Command::WinResize(size.width as u32, size.height as u32))
+            }
+            glutin::WindowEvent::CursorMoved { position, .. } => peripherals.push_back(
+                Peripheral::MousePosition(position.x as f32, position.y as f32),
+            ),
+            _ => (),
+        }
+    }
+
     pub fn poll_events(&mut self) {
         self.queue_peripheral.clear();
         self.queue_command.clear();
 
         let el = &mut self.events_loop;
-        let qc = &mut self.queue_command;
-        let qp = &mut self.queue_peripheral;
+        let mut qc = &mut self.queue_command;
+        let mut qp = &mut self.queue_peripheral;
 
-        //self.events_loop.poll_events(|event| {
-        el.poll_events(|event| {
-            match match event {
-                glutin::Event::WindowEvent { event, .. } => match event {
-                    glutin::WindowEvent::CloseRequested => GlutinEvent::Command(Command::Quit),
-                    glutin::WindowEvent::Resized(size) => {
-                        GlutinEvent::Command(Command::WinResize(size.width as u32, size.height as u32))
-                    }
-                    glutin::WindowEvent::CursorMoved { position, .. } => GlutinEvent::Peripheral(
-                        Peripheral::MousePosition(position.x as f32, position.y as f32),
-                    ),
-                    _ => GlutinEvent::None,
-                },
-                _ => GlutinEvent::None,
-            } {
-                GlutinEvent::Command(c) => if qc.len() < QUEUE_LEN {
-                    qc.push_back(c);
-                },
-                GlutinEvent::Peripheral(p) => if qp.len() < QUEUE_LEN {
-                    qp.push_back(p);
-                },
-                _ => (),
+        el.poll_events(|event| match event {
+            glutin::Event::WindowEvent { event, .. } => {
+                Self::translate_glutin_window_event(&event, &mut qp, &mut qc)
             }
+            _ => (),
         });
     }
 
