@@ -15,7 +15,7 @@ impl Program {
         vert_src: &'static str,
         frag_src: &'static str,
         attribute_binds: &[&'static str],
-    ) -> Result<Program, String> {
+    ) -> Result<Self, String> {
         let id_vert = create_shader(gl::VERTEX_SHADER, vert_src.to_string())?;
         let id_frag = create_shader(gl::FRAGMENT_SHADER, frag_src.to_string())?;
 
@@ -38,7 +38,7 @@ impl Program {
             gl::DeleteShader(id_frag);
         }
 
-        Ok(Program { program })
+        Ok(Self { program })
     }
 
     pub fn use_program(&self) {

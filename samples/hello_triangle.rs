@@ -89,14 +89,6 @@ impl Sample {
                 }
             }
 
-            // Peripheral events
-            while let Some(p) = self.win.next_peripheral() {
-                match p {
-                    window::Peripheral::MousePosition(_, _) => (),
-                    _ => (),
-                }
-            }
-
             unsafe {
                 gl::Clear(gl::COLOR_BUFFER_BIT);
             }

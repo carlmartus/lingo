@@ -5,7 +5,8 @@ use lingo::window;
 fn main() {
     let mut win = window::WindowBuilder::new()
         .with_title("Event test".to_string())
-        .build().unwrap();
+        .build()
+        .unwrap();
 
     'gameloop: loop {
         win.poll_events();
@@ -21,7 +22,7 @@ fn main() {
                     match id {
                         window::ButtonId::Keyboard { scancode, .. } => {
                             println!("keyboard {}", scancode);
-                        },
+                        }
                         window::ButtonId::Mouse(button) => {
                             print!("mouse ");
                             match button {
@@ -30,9 +31,9 @@ fn main() {
                                 window::MouseButton::Middle => println!("middle"),
                                 window::MouseButton::Other(n) => println!("other {}", n),
                             };
-                        },
+                        }
                     }
-                },
+                }
             }
         }
 
@@ -44,13 +45,13 @@ fn main() {
                 window::Command::Quit => {
                     println!("Command Quit");
                     close = true;
-                },
+                }
                 _ => (),
             }
         }
 
         if close {
-            break'gameloop;
+            break 'gameloop;
         }
     }
 }

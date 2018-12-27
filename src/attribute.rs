@@ -46,7 +46,7 @@ pub struct Pipeline {
 }
 
 impl PrimitiveType {
-    pub fn to_gl_enum(t: PrimitiveType) -> GLenum {
+    pub fn to_gl_enum(t: Self) -> GLenum {
         match t {
             PrimitiveType::Points => gl::POINTS,
             PrimitiveType::Lines => gl::LINES,
@@ -87,8 +87,8 @@ impl DataType {
 }
 
 impl Pipeline {
-    pub fn new(primitive_type: PrimitiveType) -> Result<Pipeline, String> {
-        Ok(Pipeline {
+    pub fn new(primitive_type: PrimitiveType) -> Result<Self, String> {
+        Ok(Self {
             draw_type: PrimitiveType::to_gl_enum(primitive_type),
             parts: Vec::new(),
             buffers: Vec::new(),

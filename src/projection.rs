@@ -6,7 +6,7 @@ pub struct Matrix4x4 {
 pub struct Vec3(pub f32, pub f32, pub f32);
 
 impl Vec3 {
-    fn normalize(&self) -> Vec3 {
+    fn normalize(&self) -> Self {
         let r = (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt();
         if r == 0f32 {
             self.clone()
@@ -16,7 +16,7 @@ impl Vec3 {
         }
     }
 
-    fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
+    fn cross(a: &Self, b: &Self) -> Self {
         Vec3(
             a.1 * b.2 - a.2 * b.1,
             a.2 * b.0 - a.0 * b.2,
@@ -26,8 +26,8 @@ impl Vec3 {
 }
 
 impl Matrix4x4 {
-    pub fn new() -> Matrix4x4 {
-        let mut res = Matrix4x4 { values: [0f32; 16] };
+    pub fn new() -> Self {
+        let mut res = Self { values: [0f32; 16] };
 
         res.identity();
         res
@@ -84,7 +84,7 @@ impl Matrix4x4 {
         });
     }
 
-    pub fn multiply(a: &Matrix4x4, b: &Matrix4x4) -> Matrix4x4 {
+    pub fn multiply(a: &Self, b: &Self) -> Self {
         let mut values = [0f32; 16];
 
         let mut i = 0;
@@ -99,7 +99,7 @@ impl Matrix4x4 {
             }
         }
 
-        Matrix4x4 { values }
+        Self { values }
     }
 
     pub fn look_at(&mut self, eye: Vec3, at: Vec3, up: Vec3) {
@@ -111,7 +111,7 @@ impl Matrix4x4 {
 
         let up = Vec3::cross(&forw, &side);
 
-        let mut m0 = Matrix4x4::new();
+        let mut m0 = Self::new();
 
         m0.values[0] = side.0;
         m0.values[4] = side.1;
@@ -125,12 +125,12 @@ impl Matrix4x4 {
         m0.values[6] = -forw.1;
         m0.values[10] = -forw.2;
 
-        let mut m1 = Matrix4x4::new();
+        let mut m1 = Self::new();
         m1.values[12] = -eye.0;
         m1.values[13] = -eye.1;
         m1.values[14] = -eye.2;
 
-        *self = Matrix4x4::multiply(&m1, &m0);
+        *self = Self::multiply(&m1, &m0);
     }
 
     pub fn camera_3d(
@@ -144,12 +144,12 @@ impl Matrix4x4 {
         up: Vec3,
     ) {
         // Perspective matrix
-        let mut perspective = Matrix4x4::new();
+        let mut perspective = Self::new();
         perspective.perspective(fov, ratio, near, far);
 
-        let mut look = Matrix4x4::new();
+        let mut look = Self::new();
         look.look_at(eye, at, up);
 
-        *self = Matrix4x4::multiply(&look, &perspective);
+        *self = Self::multiply(&look, &perspective);
     }
 }

@@ -46,7 +46,7 @@ impl<T> HwBuf<T> {
             gl::BufferData(gl::ARRAY_BUFFER, max_size, ptr::null(), usage.to_gl_enum());
         };
 
-        Ok(HwBuf {
+        Ok(Self {
             gl_vbo,
             data: Vec::with_capacity(max_verts),
         })
