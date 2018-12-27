@@ -19,3 +19,7 @@ path = "samples/camera.rs"
 [[example]]
 name = "stride"
 path = "samples/stride.rs"
+
+[[example]]
+name = "events"
+path = "samples/events.rs"
