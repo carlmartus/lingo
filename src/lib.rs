@@ -12,10 +12,10 @@ pub mod window;
 mod test;
 
 pub mod draw {
-    pub use attribute::{DataType, Pipeline, PrimitiveType};
-    pub use error::print_gl_error;
-    pub use hwbuf::HwBuf;
-    pub use hwbuf::Usage;
-    pub use projection::{Matrix4x4, Vec3};
-    pub use shader::{Program, UniformLocation};
+    pub use crate::attribute::{DataType, Pipeline, PrimitiveType};
+    pub use crate::error::print_gl_error;
+    pub use crate::hwbuf::HwBuf;
+    pub use crate::hwbuf::Usage;
+    pub use crate::projection::{Matrix4x4, Vec3};
+    pub use crate::shader::{Program, UniformLocation};
 }
