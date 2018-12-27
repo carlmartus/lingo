@@ -4,8 +4,7 @@ use glutin::{dpi, GlContext};
 use glutin::{EventsLoop, GlWindow};
 use std::collections::vec_deque::VecDeque;
 
-pub use glutin::MouseButton;
-pub use glutin::VirtualKeyCode;
+pub use glutin::{DeviceId, MouseButton, VirtualKeyCode};
 
 const QUEUE_LEN: usize = 20;
 
@@ -22,9 +21,14 @@ pub enum ButtonId {
     },
 }
 
-pub enum Peripheral {
+pub enum PeripheralEvent {
     MousePosition(f32, f32),
     Button(ButtonId, bool),
+}
+
+pub struct Peripheral {
+    pub device_id: DeviceId,
+    pub event: PeripheralEvent,
 }
 
 pub enum Command {
@@ -46,6 +50,12 @@ pub struct WindowBuilder {
     title: Option<String>,
     w: u32,
     h: u32,
+}
+
+impl Peripheral {
+    pub fn new(device_id: DeviceId, event: PeripheralEvent) -> Self {
+        Self { device_id, event }
+    }
 }
 
 impl Window {
@@ -86,9 +96,14 @@ impl Window {
             glutin::WindowEvent::Resized(size) => {
                 commands.push_back(Command::WinResize(size.width as u32, size.height as u32))
             }
-            glutin::WindowEvent::CursorMoved { position, .. } => peripherals.push_back(
-                Peripheral::MousePosition(position.x as f32, position.y as f32),
-            ),
+            glutin::WindowEvent::CursorMoved {
+                device_id,
+                position,
+                ..
+            } => peripherals.push_back(Peripheral::new(
+                device_id.clone(),
+                PeripheralEvent::MousePosition(position.x as f32, position.y as f32),
+            )),
             _ => (),
         }
     }
