@@ -19,4 +19,5 @@ This library is meant to make this job easier.
 - [3D camera](samples/camera.rs), using projections to get a 3D camera
   perspective.
 - [Stride](samples/stride.rs), multiple vertex attributes using stride.
+- [Events](samples/events.rs), prints all window events on `stdout`.
 
