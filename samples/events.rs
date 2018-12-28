@@ -20,8 +20,11 @@ fn main() {
                 window::PeripheralEvent::Button(id, press) => {
                     print!("Button press {} ", press);
                     match id {
-                        window::ButtonId::Keyboard { scancode, .. } => {
-                            println!("keyboard {}", scancode);
+                        window::ButtonId::Keyboard {
+                            scancode, vcode, ..
+                        } => {
+                            print!("keyboard: Has Virtual? {}, ", vcode.is_some());
+                            println!("Scancode is {}", scancode);
                         }
                         window::ButtonId::Mouse(button) => {
                             print!("mouse ");

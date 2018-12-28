@@ -1,7 +1,7 @@
 extern crate gl;
 extern crate glutin;
 use glutin::{dpi, GlContext};
-use glutin::{EventsLoop, GlWindow};
+use glutin::{EventsLoop, GlWindow, WindowEvent};
 use std::collections::vec_deque::VecDeque;
 
 pub use glutin::{DeviceId, ElementState, MouseButton, VirtualKeyCode};
@@ -13,7 +13,7 @@ type CommandQueue = VecDeque<Command>;
 
 pub enum ButtonId {
     Keyboard {
-        vcode: VirtualKeyCode,
+        vcode: Option<VirtualKeyCode>,
         scancode: u32,
     },
     Mouse(MouseButton),
@@ -85,16 +85,16 @@ impl Window {
     }
 
     fn translate_glutin_window_event(
-        event: &glutin::WindowEvent,
+        event: &WindowEvent,
         peripherals: &mut PeripheralQueue,
         commands: &mut CommandQueue,
     ) {
         match event {
-            glutin::WindowEvent::CloseRequested => commands.push_back(Command::Quit),
-            glutin::WindowEvent::Resized(size) => {
+            WindowEvent::CloseRequested => commands.push_back(Command::Quit),
+            WindowEvent::Resized(size) => {
                 commands.push_back(Command::WinResize(size.width as u32, size.height as u32))
             }
-            glutin::WindowEvent::CursorMoved {
+            WindowEvent::CursorMoved {
                 device_id,
                 position,
                 ..
@@ -102,7 +102,23 @@ impl Window {
                 device_id.clone(),
                 PeripheralEvent::MousePosition(position.x as f32, position.y as f32),
             )),
-            glutin::WindowEvent::MouseInput {
+            WindowEvent::KeyboardInput {
+                device_id,
+                input, /*
+                       scancode,
+                       vcode,
+                       state,*/
+            } => peripherals.push_back(Peripheral::new(
+                device_id.clone(),
+                PeripheralEvent::Button(
+                    ButtonId::Keyboard {
+                        vcode: input.virtual_keycode,
+                        scancode: input.scancode,
+                    },
+                    input.state == ElementState::Pressed,
+                ),
+            )),
+            WindowEvent::MouseInput {
                 device_id,
                 state,
                 button,
