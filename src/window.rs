@@ -32,6 +32,7 @@ pub struct Peripheral {
 pub enum Command {
     Quit,
     WinResize(u32, u32),
+    WinFocus(bool),
 }
 
 pub struct Window {
@@ -104,10 +105,7 @@ impl Window {
             )),
             WindowEvent::KeyboardInput {
                 device_id,
-                input, /*
-                       scancode,
-                       vcode,
-                       state,*/
+                input,
             } => peripherals.push_back(Peripheral::new(
                 device_id.clone(),
                 PeripheralEvent::Button(
@@ -118,6 +116,7 @@ impl Window {
                     input.state == ElementState::Pressed,
                 ),
             )),
+            WindowEvent::Focused(focus) => commands.push_back(Command::WinFocus(*focus)),
             WindowEvent::MouseInput {
                 device_id,
                 state,

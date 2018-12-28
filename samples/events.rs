@@ -49,7 +49,10 @@ fn main() {
                     println!("Command Quit");
                     close = true;
                 }
-                _ => (),
+                window::Command::WinResize(w, h) => {
+                    println!("Window resized to {}x{}", w, h);
+                }
+                window::Command::WinFocus(focused) => println!("Window focused? {}", focused),
             }
         }
 
