@@ -17,6 +17,9 @@ fn main() {
 
             match p.event {
                 window::PeripheralEvent::MousePosition(x, y) => println!("Mouse move {}, {}", x, y),
+                window::PeripheralEvent::MouseEntered(entered) => {
+                    println!("Mouse entered window: {}", entered)
+                }
                 window::PeripheralEvent::Button(id, press) => {
                     print!("Button press {} ", press);
                     match id {

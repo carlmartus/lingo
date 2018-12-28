@@ -22,6 +22,7 @@ pub enum ButtonId {
 pub enum PeripheralEvent {
     MousePosition(f32, f32),
     Button(ButtonId, bool),
+    MouseEntered(bool),
 }
 
 pub struct Peripheral {
@@ -118,6 +119,14 @@ impl Window {
                 ))
             }
             WindowEvent::Focused(focus) => commands.push_back(Command::WinFocus(*focus)),
+            WindowEvent::CursorEntered { device_id } => peripherals.push_back(Peripheral::new(
+                device_id.clone(),
+                PeripheralEvent::MouseEntered(true),
+            )),
+            WindowEvent::CursorLeft { device_id } => peripherals.push_back(Peripheral::new(
+                device_id.clone(),
+                PeripheralEvent::MouseEntered(false),
+            )),
             WindowEvent::MouseInput {
                 device_id,
                 state,
