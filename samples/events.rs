@@ -55,6 +55,9 @@ fn main() {
                 window::Command::WinResize(w, h) => {
                     println!("Window resized to {}x{}", w, h);
                 }
+                window::Command::WinMove(x, y) => {
+                    println!("Window moved to {}, {}", x, y);
+                }
                 window::Command::WinFocus(focused) => println!("Window focused? {}", focused),
                 window::Command::TypeCharacter(ch) => println!("Type charactar '{}'", ch),
             }

@@ -33,6 +33,7 @@ pub struct Peripheral {
 pub enum Command {
     Quit,
     WinResize(u32, u32),
+    WinMove(i32, i32),
     WinFocus(bool),
     TypeCharacter(char),
 }
@@ -96,6 +97,9 @@ impl Window {
             WindowEvent::CloseRequested => commands.push_back(Command::Quit),
             WindowEvent::Resized(size) => {
                 commands.push_back(Command::WinResize(size.width as u32, size.height as u32))
+            }
+            WindowEvent::Moved(loc) => {
+                commands.push_back(Command::WinMove(loc.x as i32, loc.y as i32))
             }
             WindowEvent::CursorMoved {
                 device_id,
