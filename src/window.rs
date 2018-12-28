@@ -33,6 +33,7 @@ pub enum Command {
     Quit,
     WinResize(u32, u32),
     WinFocus(bool),
+    TypeCharacter(char),
 }
 
 pub struct Window {
@@ -103,19 +104,19 @@ impl Window {
                 device_id.clone(),
                 PeripheralEvent::MousePosition(position.x as f32, position.y as f32),
             )),
-            WindowEvent::KeyboardInput {
-                device_id,
-                input,
-            } => peripherals.push_back(Peripheral::new(
-                device_id.clone(),
-                PeripheralEvent::Button(
-                    ButtonId::Keyboard {
-                        vcode: input.virtual_keycode,
-                        scancode: input.scancode,
-                    },
-                    input.state == ElementState::Pressed,
-                ),
-            )),
+            WindowEvent::ReceivedCharacter(ch) => commands.push_back(Command::TypeCharacter(*ch)),
+            WindowEvent::KeyboardInput { device_id, input } => {
+                peripherals.push_back(Peripheral::new(
+                    device_id.clone(),
+                    PeripheralEvent::Button(
+                        ButtonId::Keyboard {
+                            vcode: input.virtual_keycode,
+                            scancode: input.scancode,
+                        },
+                        input.state == ElementState::Pressed,
+                    ),
+                ))
+            }
             WindowEvent::Focused(focus) => commands.push_back(Command::WinFocus(*focus)),
             WindowEvent::MouseInput {
                 device_id,

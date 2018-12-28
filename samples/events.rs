@@ -53,6 +53,7 @@ fn main() {
                     println!("Window resized to {}x{}", w, h);
                 }
                 window::Command::WinFocus(focused) => println!("Window focused? {}", focused),
+                window::Command::TypeCharacter(ch) => println!("Type charactar '{}'", ch),
             }
         }
 
