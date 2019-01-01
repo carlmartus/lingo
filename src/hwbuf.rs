@@ -88,3 +88,11 @@ impl<T> HwBuf<T> {
         self.data.len()
     }
 }
+
+impl<T> Drop for HwBuf<T> {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteBuffers(1, &mut self.gl_vbo);
+        }
+    }
+}

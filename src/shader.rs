@@ -69,6 +69,14 @@ impl Program {
     }
 }
 
+impl Drop for Program {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteProgram(self.program);
+        }
+    }
+}
+
 fn create_shader(type_enum: GLenum, src: String) -> Result<GLuint, String> {
     unsafe {
         let id = gl::CreateShader(type_enum);
