@@ -52,7 +52,13 @@ impl Sample {
             .with_title("Lingo stride example".to_string())
             .build()?;
 
-        let prog = draw::Program::from_static(STRIDE_VERT, STRIDE_FRAG, &["at_loc", "at_color"])?;
+        let prog = draw::ProgramBuilder::new()?
+            .vertex_shader(STRIDE_VERT.to_string())?
+            .fragment_shader(STRIDE_FRAG.to_string())?
+            .link()?
+            .bind_attribute("at_loc".to_string(), 0)?
+            .bind_attribute("at_color".to_string(), 1)?
+            .build();
 
         let mut verts = draw::HwBuf::new(3, draw::Usage::Static)?;
         verts.push(Vertex(0.0, 0.0, 1, 0, 0, 1));

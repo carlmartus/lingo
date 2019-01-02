@@ -1,74 +1,78 @@
 extern crate gl;
 
+use crate::error::check_gl_error;
 use crate::shader::{create_shader, Program};
-use gl::types::GLuint;
+use gl::types::{GLenum, GLuint};
 use std::ffi::CString;
 
-enum Components {
-    Shader(GLuint),
-    Attribute(String, usize),
-}
-
 pub struct ProgramBuilder {
-    comps: Vec<Components>,
+    program: GLuint,
+    shaders: Vec<GLuint>,
 }
 
 impl ProgramBuilder {
-    pub fn new() -> Self {
-        ProgramBuilder { comps: Vec::new() }
+    pub fn new() -> Result<Self, String> {
+        let program = unsafe { gl::CreateProgram() };
+
+        check_gl_error()?;
+
+        Ok(ProgramBuilder {
+            program,
+            shaders: Vec::new(),
+        })
     }
 
     pub fn fragment_shader(&mut self, source: String) -> Result<&mut Self, String> {
-        self.comps.push(Components::Shader(create_shader(
-            gl::VERTEX_SHADER,
-            source,
-        )?));
-        Ok(self)
+        self.add_shader(gl::FRAGMENT_SHADER, source)
     }
 
     pub fn vertex_shader(&mut self, source: String) -> Result<&mut Self, String> {
-        self.comps.push(Components::Shader(create_shader(
-            gl::VERTEX_SHADER,
-            source,
-        )?));
+        self.add_shader(gl::VERTEX_SHADER, source)
+    }
+
+    pub fn bind_attribute(&mut self, name: String, bind_id: usize) -> Result<&mut Self, String> {
+        let name_str = &name.as_str();
+        unsafe {
+            gl::BindAttribLocation(
+                self.program,
+                bind_id as GLuint,
+                CString::new(*name_str).unwrap().as_ptr(),
+            );
+        }
+        check_gl_error()?;
+
         Ok(self)
     }
 
-    pub fn bind_attribute(&mut self, name: String, bind_id: usize) -> &mut Self {
-        self.comps.push(Components::Attribute(name, bind_id));
-        self
+    pub fn link(&mut self) -> Result<&mut Self, String> {
+        unsafe {
+            gl::LinkProgram(self.program);
+            check_gl_error()?;
+        }
+
+        Ok(self)
     }
 
-    pub fn build(&mut self) -> Result<Program, String> {
-        let program;
-        unsafe {
-            program = gl::CreateProgram();
-
-            for c in &self.comps {
-                match c {
-                    Components::Shader(id) => gl::AttachShader(program, *id),
-                    _ => (),
-                }
-            }
-
-            gl::LinkProgram(program);
-
-            for c in &self.comps {
-                match c {
-                    Components::Shader(id) => gl::DeleteShader(*id),
-                    Components::Attribute(name, id) => {
-                        let name_str = &name.as_str();
-                        gl::BindAttribLocation(
-                            program,
-                            *id as GLuint,
-                            CString::new(*name_str).unwrap().as_ptr(),
-                            );
-
-                    }
-                }
+    pub fn build(&mut self) -> Program {
+        for c in &self.shaders {
+            unsafe {
+                gl::DeleteShader(*c);
             }
         }
 
-        Ok(Program { program })
+        Program {
+            program: self.program,
+        }
+    }
+
+    fn add_shader(&mut self, shader_type: GLenum, source: String) -> Result<&mut Self, String> {
+        let shader = create_shader(shader_type, source)?;
+
+        unsafe {
+            gl::AttachShader(self.program, shader);
+        }
+
+        self.shaders.push(shader);
+        Ok(self)
     }
 }

@@ -49,7 +49,13 @@ impl Camera {
             .with_title("dialog".to_string())
             .build()?;
 
-        let prog = draw::Program::from_static(CAMERA_VERT, CAMERA_FRAG, &["at_loc"])?;
+        let prog = draw::ProgramBuilder::new()?
+            .vertex_shader(CAMERA_VERT.to_string())?
+            .fragment_shader(CAMERA_FRAG.to_string())?
+            .link()?
+            .bind_attribute("at_loc".to_string(), 0)?
+            .build();
+
         let mut verts = draw::HwBuf::new(5, draw::Usage::Static)?;
         verts.push(Vertex(0, 0));
         verts.push(Vertex(1, 0));
