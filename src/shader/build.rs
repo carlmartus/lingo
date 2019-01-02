@@ -30,6 +30,22 @@ impl ProgramBuilder {
         self.add_shader(gl::VERTEX_SHADER, source)
     }
 
+    pub fn geometry_shader(&mut self, source: String) -> Result<&mut Self, String> {
+        self.add_shader(gl::GEOMETRY_SHADER, source)
+    }
+
+    pub fn compute_shader(&mut self, source: String) -> Result<&mut Self, String> {
+        self.add_shader(gl::COMPUTE_SHADER, source)
+    }
+
+    pub fn tesslation_control_shader(&mut self, source: String) -> Result<&mut Self, String> {
+        self.add_shader(gl::TESS_CONTROL_SHADER, source)
+    }
+
+    pub fn tesslation_evaluation_shader(&mut self, source: String) -> Result<&mut Self, String> {
+        self.add_shader(gl::TESS_EVALUATION_SHADER, source)
+    }
+
     pub fn bind_attribute(&mut self, name: String, bind_id: usize) -> Result<&mut Self, String> {
         let name_str = &name.as_str();
         unsafe {
