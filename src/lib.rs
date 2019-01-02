@@ -17,5 +17,5 @@ pub mod draw {
     pub use crate::hwbuf::HwBuf;
     pub use crate::hwbuf::Usage;
     pub use crate::projection::{Matrix4x4, Vec3};
-    pub use crate::shader::{Program, UniformLocation};
+    pub use crate::shader::{Program, ProgramBuilder, UniformLocation};
 }

@@ -45,6 +45,13 @@ impl Sample {
             .with_title("dialog".to_string())
             .build()?;
 
+        /*
+        let prog = draw::ProgramBuilder::new()
+            .fragment_shader(RED_FRAG.to_string())?
+            .vertex_shader(RED_VERT.to_string())?
+            .bind_attribute("at_loc".to_string(), 0)
+            .build();*/
+
         // Create shader program from source
         let prog = draw::Program::from_static(RED_VERT, RED_FRAG, &["at_loc"])?;
 

@@ -1,14 +1,9 @@
 extern crate gl;
 
-use gl::types::{GLchar, GLenum, GLint, GLuint};
+use crate::shader::create_shader;
+use crate::shader::{Program, UniformLocation};
+use gl::types::{GLint, GLuint};
 use std::ffi::CString;
-use std::{ffi, ptr, str};
-
-pub struct Program {
-    program: GLuint,
-}
-
-pub struct UniformLocation(GLint);
 
 impl Program {
     pub fn from_static(
@@ -77,6 +72,7 @@ impl Drop for Program {
     }
 }
 
+/*
 fn create_shader(type_enum: GLenum, src: String) -> Result<GLuint, String> {
     unsafe {
         let id = gl::CreateShader(type_enum);
@@ -101,3 +97,4 @@ fn create_shader(type_enum: GLenum, src: String) -> Result<GLuint, String> {
         }
     }
 }
+*/
