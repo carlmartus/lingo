@@ -1,12 +1,10 @@
 pub extern crate gl;
-pub extern crate glutin;
 
 mod attribute;
 mod error;
 mod hwbuf;
 mod projection;
 mod shader;
-pub mod window;
 
 #[cfg(test)]
 mod test;

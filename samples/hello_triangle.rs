@@ -1,6 +1,8 @@
 extern crate lingo;
 
-use lingo::{draw, gl, window};
+use lingo::{draw, gl};
+
+include!("examples_shared.rs");
 
 const RED_VERT: &'static str = r#"
 #version 100
@@ -24,87 +26,59 @@ void main() {
 
 struct Vertex(f32, f32);
 
-struct Sample {
-    win: window::Window,
-    prog: draw::Program,
-    verts: draw::HwBuf<Vertex>,
-    pipeline: draw::Pipeline,
-}
-
 fn main() {
-    match Sample::new() {
-        Ok(mut s) => s.run(),
-        Err(msg) => eprintln!("Error at start: {}", msg),
+    if let Err(msg) = sample() {
+        eprintln!("Example error: {}", msg);
     }
 }
 
-impl Sample {
-    pub fn new() -> Result<Sample, String> {
-        // Create window
-        let win = window::WindowBuilder::new()
-            .with_title("dialog".to_string())
-            .build()?;
+fn sample() -> Result<(), String> {
+    let mut win = Window::new();
 
-        // Create shader program from source
-        let prog = draw::ProgramBuilder::new()?
-            .vertex_shader(RED_VERT.to_string())?
-            .fragment_shader(RED_FRAG.to_string())?
-            .link()?
-            .bind_attribute("at_loc".to_string(), 0)?
-            .build();
+    // Create shader program from source
+    let prog = draw::ProgramBuilder::new()?
+        .vertex_shader(RED_VERT.to_string())?
+        .fragment_shader(RED_FRAG.to_string())?
+        .link()?
+        .bind_attribute("at_loc".to_string(), 0)?
+        .build();
 
-        // Create buffer for geometry
-        let mut verts = draw::HwBuf::new(10, draw::Usage::Static)?;
+    // Create buffer for geometry
+    let mut verts = draw::HwBuf::new(10, draw::Usage::Static)?;
 
-        // Fill buffer with a triangle
-        verts.push(Vertex(0.0, 0.0));
-        verts.push(Vertex(1.0, 0.0));
-        verts.push(Vertex(0.0, 1.0));
-        verts.prepear_graphics();
+    // Fill buffer with a triangle
+    verts.push(Vertex(0.0, 0.0));
+    verts.push(Vertex(1.0, 0.0));
+    verts.push(Vertex(0.0, 1.0));
+    verts.prepear_graphics();
 
-        // Describe rendering attributes
-        let mut pipeline = draw::Pipeline::new(draw::PrimitiveType::Triangles)?;
-        let buf_id = pipeline.push_buffer(&verts, 0);
-        pipeline.push_attribute(buf_id, 2, draw::DataType::F32, false);
+    // Describe rendering attributes
+    let mut pipeline = draw::Pipeline::new(draw::PrimitiveType::Triangles)?;
+    let buf_id = pipeline.push_buffer(&verts, 0);
+    pipeline.push_attribute(buf_id, 2, draw::DataType::F32, false);
 
-        // Did any error occur?
-        draw::print_gl_error()?;
+    // Did any error occur?
+    draw::print_gl_error()?;
 
+    unsafe {
+        gl::ClearColor(0.3, 0.4, 0.5, 1.0);
+    }
+
+    loop {
         unsafe {
-            gl::ClearColor(0.3, 0.4, 0.5, 1.0);
+            gl::Clear(gl::COLOR_BUFFER_BIT);
         }
 
-        Ok(Sample {
-            win,
-            prog,
-            verts,
-            pipeline,
-        })
-    }
+        prog.use_program();
+        verts.bind();
+        pipeline.draw(3);
 
-    pub fn run(&mut self) {
-        'gameloop: loop {
-            self.win.poll_events();
+        draw::print_gl_error().unwrap();
 
-            // Command events
-            while let Some(c) = self.win.next_command() {
-                match c {
-                    window::Command::Quit => break 'gameloop,
-                    _ => (),
-                }
-            }
-
-            unsafe {
-                gl::Clear(gl::COLOR_BUFFER_BIT);
-            }
-
-            self.prog.use_program();
-            self.verts.bind();
-            self.pipeline.draw(3);
-
-            draw::print_gl_error().unwrap();
-
-            self.win.swap_buffers();
+        if win.next() {
+            break;
         }
     }
+
+    Ok(())
 }
