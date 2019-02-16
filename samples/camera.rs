@@ -4,11 +4,10 @@ use lingo::{draw, gl};
 
 include!("examples_shared.rs");
 
-const CAMERA_VERT: &'static str = r#"
-#version 100
+const CAMERA_VERT: &'static str = r#"#version 300 es
 precision mediump float;
 
-attribute vec2 at_loc;
+layout(location=0) in vec2 at_loc;
 uniform mat4 un_mvp;
 
 void main() {
@@ -16,12 +15,13 @@ void main() {
 }
 "#;
 
-const CAMERA_FRAG: &'static str = r#"
-#version 100
+const CAMERA_FRAG: &'static str = r#"#version 300 es
 precision mediump float;
 
+out vec4 out_color;
+
 void main() {
-    gl_FragColor = vec4(1, 0, 0, 1);
+    out_color = vec4(1, 0, 0, 1);
 }
 "#;
 
@@ -43,7 +43,6 @@ fn sample() -> Result<(), String> {
         .vertex_shader(CAMERA_VERT.to_string())?
         .fragment_shader(CAMERA_FRAG.to_string())?
         .link()?
-        .bind_attribute("at_loc".to_string(), 0)?
         .build();
 
     let mut verts = draw::HwBuf::new(5, draw::Usage::Static)?;

@@ -5,14 +5,13 @@ use std::mem;
 
 include!("examples_shared.rs");
 
-const STRIDE_VERT: &'static str = r#"
-#version 100
+const STRIDE_VERT: &'static str = r#"#version 300 es
 precision mediump float;
 
-attribute vec2 at_loc;
-attribute vec4 at_color;
+layout(location=0) in vec2 at_loc;
+layout(location=1) in vec4 at_color;
 
-varying vec4 va_color;
+out vec4 va_color;
 
 void main() {
     va_color = at_color;
@@ -20,14 +19,14 @@ void main() {
 }
 "#;
 
-const STRIDE_FRAG: &'static str = r#"
-#version 100
+const STRIDE_FRAG: &'static str = r#"#version 300 es
 precision mediump float;
 
-varying vec4 va_color;
+in vec4 va_color;
+out vec4 out_color;
 
 void main() {
-    gl_FragColor = vec4(va_color);
+    out_color = va_color;
 }
 "#;
 
@@ -47,8 +46,6 @@ fn sample() -> Result<(), String> {
         .vertex_shader(STRIDE_VERT.to_string())?
         .fragment_shader(STRIDE_FRAG.to_string())?
         .link()?
-        .bind_attribute("at_loc".to_string(), 0)?
-        .bind_attribute("at_color".to_string(), 1)?
         .build();
 
     let mut verts = draw::HwBuf::new(3, draw::Usage::Static)?;
