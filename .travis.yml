@@ -1,2 +1,5 @@
+before_install:
+  - sudo apt-get -y install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+
 language: rust
 rust: 1.49.0
