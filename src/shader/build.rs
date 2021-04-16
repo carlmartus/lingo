@@ -49,11 +49,8 @@ impl ProgramBuilder {
     pub fn bind_attribute(&mut self, name: String, bind_id: usize) -> Result<&mut Self, String> {
         let name_str = &name.as_str();
         unsafe {
-            gl::BindAttribLocation(
-                self.program,
-                bind_id as GLuint,
-                CString::new(*name_str).unwrap().as_ptr(),
-            );
+            let name = CString::new(*name_str).unwrap();
+            gl::BindAttribLocation(self.program, bind_id as GLuint, name.as_ptr());
         }
         check_gl_error()?;
 

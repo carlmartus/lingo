@@ -119,7 +119,7 @@ impl Pipeline {
         });
     }
 
-    pub fn push_buffer(&mut self, hw: &HwBufReference, stride: usize) -> usize {
+    pub fn push_buffer(&mut self, hw: &dyn HwBufReference, stride: usize) -> usize {
         let index = self.buffers.len();
         self.buffers.push(BufferReference {
             gl_buffer: hw.get_gl_buffer(),

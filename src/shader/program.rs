@@ -22,11 +22,8 @@ impl Program {
             gl::LinkProgram(program);
 
             for (i, attribute) in attribute_binds.iter().enumerate() {
-                gl::BindAttribLocation(
-                    program,
-                    i as GLuint,
-                    CString::new(*attribute).unwrap().as_ptr(),
-                );
+                let name = CString::new(*attribute).unwrap();
+                gl::BindAttribLocation(program, i as GLuint, name.as_ptr());
             }
 
             gl::DeleteShader(id_vert);
@@ -49,8 +46,8 @@ impl Program {
     }
 
     pub fn get_uniform_location(&self, name: &'static str) -> UniformLocation {
-        let location =
-            unsafe { gl::GetUniformLocation(self.program, CString::new(name).unwrap().as_ptr()) };
+        let name = CString::new(name).unwrap();
+        let location = unsafe { gl::GetUniformLocation(self.program, name.as_ptr()) };
 
         UniformLocation(location)
     }
