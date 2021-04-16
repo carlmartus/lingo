@@ -5,10 +5,10 @@ authors = ["Martin Sandgren <carlmartus@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-gl = "0.11"
+gl = "0.14"
 
 [dev-dependencies]
-glfw = "0.26.1"
+glfw = "0.41.0"
 
 [[example]]
 name = "hello_triangle"
